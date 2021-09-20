@@ -1,0 +1,4 @@
+config.json
+package-lock.json
+# Project exclude paths
+/node_modules/
