@@ -27,20 +27,24 @@ client.on('interactionCreate', async interaction => {
         //author join-date timestamp - unix timecode
         const joinedtimestamp = (interaction.member.joinedTimestamp);
 
-        //total time user has been in server - unix timecode
-        const totaltimestamp = createdtimestamp - joinedtimestamp;
 
-        //convert unix timecode into hours. /1000 to convert to seconds. /60 converts to minutes. /60 converts to hours.
-        const totaltimeshour = (createdtimestamp - joinedtimestamp) / 1000 / 60 / 60;
+        //convert unix timecode into hours.
+        // /1000 to convert to seconds. /60 converts to minutes. /60 converts to hours. rounds down.
+        const totaltimeshour = Math.floor((createdtimestamp - joinedtimestamp) / 1000 / 60 / 60);
 
-        // /24 converts hours to days
-        const totaltimeday = totaltimeshour / 24;
+        // /24 converts hours to days - rounds down.
+        const totaltimeday = Math.floor(totaltimeshour / 24);
+
+        // Subtract total number days off total number of hours
+        const adjustedhours = totaltimeshour - (totaltimeday * 24);
+
 
     //looks for the command 'join'
     if (commandName === 'join') {
 
         //prints with user joined info
-        await interaction.reply(`Joined: ${moment.utc(interaction.member.joinedAt).fromNow()}\ncreated timestamp: ${createdtimestamp}\njoined timestamp: ${joinedtimestamp}\nTotal timestamp: ${totaltimestamp}\ntime in hours: ${totaltimeshour}\nTotal time in days: ${totaltimeday}`);
+        await interaction.reply(`Joined: ${moment.utc(interaction.member.joinedAt)}\nMember for ${totaltimeday} days ${adjustedhours} hours`);
+
     }
 });
 
