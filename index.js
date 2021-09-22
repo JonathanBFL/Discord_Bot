@@ -127,7 +127,7 @@ function test() {
         if (commandName === 'test') {
 
             //pulls "target" from interaction commands
-            const user = interaction.options.getUser('target');
+            const user = interaction.options.getMember('target');
 
 
 
@@ -204,9 +204,21 @@ function test() {
 
              else {
 
+//                 const x = user.guild.;
+ //               console.log('user id ' + x);
+
+
                 embed = new MessageEmbed()
                     .setColor('#0099ff')
                     .setTitle('Some title')
+                    .addFields(
+                        { name: 'Hello', value: 'Hello' },
+                        { name: '\u200B', value: '\u200B' },
+                        { name: 'ID', value: interaction.user.id, inline: true },
+                        { name: 'Username', value: interaction.user.tag, inline: true },
+                        { name: 'guild id', value: interaction.guild.id, inline: true},
+                        { name: 'guild mem', value: user.channels, inline: true}
+                    )
                     ;
 
                 interaction.channel.send(`Joined: ${joinedformated}`);
