@@ -128,20 +128,14 @@ function test() {
 
             //pulls "target" from interaction commands
             const user = interaction.options.getMember('target');
+            const user2 = interaction.options.getUser('target');
 
-
-
-
-
-            console.log(user);
 
 
 
             //message created timestamp - unix timecode
             const createdtimestamp = (interaction.createdTimestamp);
             console.log(createdtimestamp + " timestamp");
-
-
 
             //author join-date timestamp - unix timecode
             const joinedtimestamp = (user.joinedTimestamp);
@@ -182,6 +176,20 @@ function test() {
             const adjustedmonths = totaltimemonth - (totaltimeyear * 12);
             console.log(adjustedmonths);
 
+            console.log(user2.displayAvatarURL() +  " testing console");
+
+            embed = new MessageEmbed()
+                .setColor('#0099ff')
+                .setTitle('Some title')
+                .setThumbnail(user2.displayAvatarURL())
+                .addFields(
+                    //{ name: 'Hello', value: 'Hello' },
+                    //{ name: '\u200B', value: '\u200B' },
+                    { name: 'Username', value: interaction.options.getMember('target').displayName, inline: false },
+                    { name: 'Join date', value: `**${joinedformated}**`, inline: false },
+                    { name: 'guild id', value: `ss`, inline: false }
+                );
+
             //looks for length of time if 1year+
             if (totaltimeyear > 0) {
                 interaction.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimeyear} years ${adjustedmonths} months ${adjusteddays} days ${adjustedhours} hours`);
@@ -195,6 +203,7 @@ function test() {
             //looks for length of time if 1day+
             else if (totaltimeday > 0) {
                 interaction.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimeday} days ${adjustedhours} hours`);
+                interaction.reply({ embeds: [embed] });
             }
 
             //looks for length of time if 1hour+
@@ -203,23 +212,6 @@ function test() {
             }
 
              else {
-
-//                 const x = user.guild.;
- //               console.log('user id ' + x);
-
-
-                embed = new MessageEmbed()
-                    .setColor('#0099ff')
-                    .setTitle('Some title')
-                    .addFields(
-                        { name: 'Hello', value: 'Hello' },
-                        { name: '\u200B', value: '\u200B' },
-                        { name: 'ID', value: interaction.user.id, inline: true },
-                        { name: 'Username', value: interaction.user.tag, inline: true },
-                        { name: 'guild id', value: interaction.guild.id, inline: true},
-                        { name: 'guild mem', value: user.channels, inline: true}
-                    )
-                    ;
 
                 interaction.channel.send(`Joined: ${joinedformated}`);
                 interaction.reply({ embeds: [embed] })
