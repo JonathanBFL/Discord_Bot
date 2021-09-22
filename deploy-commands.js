@@ -9,11 +9,15 @@ const commands = [
     new SlashCommandBuilder()
         .setName('test') //names the command
         .setDescription('Get the avatar URL of the selected user, or your own avatar.')
+
         .addSubcommand(subcommand =>
             subcommand
-                .setName('user')
+                .setName('mention')
                 .setDescription('Info about a user')
-                .addUserOption(option => option.setName('target').setDescription('The user'))),//give description
+                .addUserOption(option => option
+                    .setRequired(true)
+                    .setName('target')
+                    .setDescription('The user'))),//give description
 ]
     .map(command => command.toJSON());
 
@@ -27,6 +31,7 @@ const rest = new REST({ version: '9' }).setToken(token);
         );
 
         console.log('registered application commands.');
+
     } catch (error) {
         console.error(error);
     }
