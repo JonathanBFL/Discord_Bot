@@ -104,12 +104,17 @@ function MentionUser() {
         if (!interaction.isCommand()) return;
 
         const {commandName} = interaction;
+
+        //looks for mention command
         if (commandName === 'mention') {
 
+            //pulls "target" from interaction commands
             const user = interaction.options.getUser('target');
 
+            // if  true return message
             if (user) return interaction.reply(`${user.username}'s avatar: ${user.displayAvatarURL({dynamic: true})}`);
 
+            // if  true false message
             return interaction.reply(`Your avatar: ${interaction.user.displayAvatarURL({dynamic: true})}`);
 
         }
@@ -120,7 +125,8 @@ function MentionUser() {
 
 //Time to put mentions and time together
 function test() {
-    console.log("function mention");
+    //console command to verify function was called
+    console.log("test function running");
 
     client.on('interactionCreate', interaction => {
 
@@ -140,11 +146,21 @@ function test() {
 
     });
 
+    //returns if no command
+    if (!interaction.isCommand()) return;
+
+    const {commandName} = interaction;
+
+    //looks for test command
+    if (commandName === 'test') {
+
+    }
+
 }
 
 //calls TimeConv function
 TimeConv();
-TimeConv();
+MentionUser();
 test();
 
 // Login to Discord with your client's token
