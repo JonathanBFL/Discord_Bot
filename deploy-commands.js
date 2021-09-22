@@ -5,6 +5,10 @@ const { clientId, guildId, token } = require('./config.json');
 
 const commands = [
     new SlashCommandBuilder().setName('join').setDescription('Replies with user join info!'),
+    new SlashCommandBuilder().setName('mention').setDescription('A test function for mentions'),
+    new SlashCommandBuilder()
+        .setName('test') //names the command
+        .setDescription('Get the avatar URL of the selected user, or your own avatar.'), //give description
 ]
     .map(command => command.toJSON());
 
