@@ -135,13 +135,11 @@ function test() {
 
         const {commandName} = interaction;
 
+        //looks for mention command
         if (commandName === 'test') {
 
+            //pulls "target" from interaction commands
             const user = interaction.options.getUser('target');
-
-            if (user) return interaction.reply(`${user.username}'s avatar: ${user.displayAvatarURL({dynamic: true})}`);
-
-            return interaction.reply(`Your avatar: ${interaction.user.displayAvatarURL({dynamic: true})}`);
 
         }
 
