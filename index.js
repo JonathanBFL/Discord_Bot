@@ -134,6 +134,7 @@ function test() {
         if (!interaction.isCommand()) return;
 
         const {commandName} = interaction;
+
         if (commandName === 'test') {
 
             const user = interaction.options.getUser('target');
@@ -145,16 +146,6 @@ function test() {
         }
 
     });
-
-    //returns if no command
-    if (!interaction.isCommand()) return;
-
-    const {commandName} = interaction;
-
-    //looks for test command
-    if (commandName === 'test') {
-
-    }
 
 }
 
