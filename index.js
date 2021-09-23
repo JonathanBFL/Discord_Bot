@@ -152,7 +152,7 @@ function test() {
             const joinedtimestamp = (user.joinedTimestamp);
 
             //formatted time when user joined
-            const joinedformated = moment.utc(user.joinedAt);
+            const joinedformated = moment.utc(user.joinedAt).format('LLL');
 
             //convert unix timecode into hours.
             // /1000 to convert to seconds. /60 converts to minutes. /60 converts to hours. rounds down.
@@ -182,16 +182,31 @@ function test() {
             embed = new MessageEmbed()
                 .setColor('#0099ff')
                 .setTitle('Discord Member Join Information')
-                .setAuthor("EFSC Bot", dev.displayAvatarURL({ dynamic:true }))
+                .setAuthor("EFSC Bot", dev.displayAvatarURL({dynamic: true}))
                 .setThumbnail(user2.displayAvatarURL())
+                .setTimestamp()
+                .setColor('#007940')
                 .addFields(
-                    { name: 'Username', value: interaction.options.getMember('target').displayName, inline: false },
-                    { name: 'Join date', value: `**${joinedformated}**`, inline: false },
-                    { name: 'Membership Length', value: `Member for **${totaltimeyear}** years **${adjustedmonths}** months **${adjusteddays}** days **${adjustedhours}** hours`, inline: false }
-                );
+                    {name: 'Nickname', value: interaction.options.getMember('target').displayName, inline: true},
+                    {name: 'Username', value: interaction.options.getUser('target').tag, inline: true},
+                    {name: '\u200b', value: '\u200b'},
+                    {name: 'Joined Our Discord', value: moment.utc(user.joinedAt).format('LLL'), inline: true},
+                    {
+                        name: 'Joined Discord',
+                        value: moment(interaction.options.getUser('target').createdAt, "YYYYMMDD").fromNow(),
+                        inline: true
+                    },
+                    {name: '\u200b', value: '\u200b'},
+                    {
+                        name: 'Membership Length',
+                        value: `Member for **${totaltimeyear}** years **${adjustedmonths}** months **${adjusteddays}** days **${adjustedhours}** hours`
+                    }
+                )
+                .setFooter('Eastern State Florida Cyber Team', dev.displayAvatarURL({dynamic: true}));
+
 
             //calls to print embed
-            interaction.reply({ embeds: [embed] });
+            interaction.reply({embeds: [embed]});
 
         }
 
