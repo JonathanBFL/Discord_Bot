@@ -9,7 +9,6 @@ const commands = [
     new SlashCommandBuilder()
         .setName('test') //names the command
         .setDescription('Get the avatar URL of the selected user, or your own avatar.')
-
         .addSubcommand(subcommand =>
             subcommand
                 .setName('mention')

@@ -1,6 +1,6 @@
 // Require the necessary discord.js classes
 const {Client, Intents, MessageEmbed} = require('discord.js');
-const {token, guildId} = require('./config.json');
+const {token, guildId, clientId} = require('./config.json');
 const moment = require("moment");
 
 // Create a new client instance
@@ -130,6 +130,15 @@ function test() {
             const user = interaction.options.getMember('target');
             const user2 = interaction.options.getUser('target');
 
+            const dev = client.users.cache.get(clientId)
+
+
+            console.log(dev + " avatar")
+           console.log(user2 + " user 2");
+
+
+
+            //interaction.channel.send(clientId.displayAvatarURL());
 
 
 
@@ -180,7 +189,8 @@ function test() {
 
             embed = new MessageEmbed()
                 .setColor('#0099ff')
-                .setTitle('Some title')
+                .setTitle('Discord Member Join Information')
+                .setAuthor("EFSC Bot", dev.displayAvatarURL({ dynamic:true }))
                 .setThumbnail(user2.displayAvatarURL())
                 .addFields(
                     //{ name: 'Hello', value: 'Hello' },
