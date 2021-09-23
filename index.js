@@ -126,111 +126,62 @@ function test() {
         //looks for mention command
         if (commandName === 'test') {
 
-            //pulls "target" from interaction commands
+            //pulls "target" from interaction commands - guildmemberIDs
             const user = interaction.options.getMember('target');
+
+            //pulls "target" from interaction commands - userIDS
             const user2 = interaction.options.getUser('target');
 
+            //pulls bot userID from cache
             const dev = client.users.cache.get(clientId)
-
-
-            console.log(dev + " avatar")
-           console.log(user2 + " user 2");
-
-
-
-            //interaction.channel.send(clientId.displayAvatarURL());
-
-
 
             //message created timestamp - unix timecode
             const createdtimestamp = (interaction.createdTimestamp);
-            console.log(createdtimestamp + " timestamp");
 
             //author join-date timestamp - unix timecode
             const joinedtimestamp = (user.joinedTimestamp);
-            console.log(joinedtimestamp + " timestamp");
 
             //formatted time when user joined
             const joinedformated = moment.utc(user.joinedAt);
-            console.log(joinedformated + " timestamp");
 
             //convert unix timecode into hours.
             // /1000 to convert to seconds. /60 converts to minutes. /60 converts to hours. rounds down.
             const totaltimehour = Math.floor((createdtimestamp - joinedtimestamp) / 1000 / 60 / 60);
-            console.log(totaltimehour);
 
             // /24 converts hours to days - rounds down.
             const totaltimeday = Math.floor(totaltimehour / 24);
-            console.log(totaltimeday);
 
             // Subtract total number days off total number of hours
             //prevents out of bounds var if days/weeks/months/years are used
             const adjustedhours = totaltimehour - (totaltimeday * 24);
-            console.log(adjustedhours);
 
             //Months uses 30 days as a month todo: fix month usage
             const totaltimemonth = Math.floor(totaltimeday / 30);
-            console.log(totaltimemonth);
 
             //takes total days subtracted by (num. of months * 30)
             //prevents out of bounds var if weeks/months/years are used
             const adjusteddays = totaltimeday - (totaltimemonth * 30);
-            console.log(adjusteddays);
 
             //takes total days divided by 365 to get years
             const totaltimeyear = Math.floor(totaltimeday / 365);
-            console.log(totaltimeyear);
 
             //prevents out of bounds var if years are used
             const adjustedmonths = totaltimemonth - (totaltimeyear * 12);
-            console.log(adjustedmonths);
 
-            console.log(user2.displayAvatarURL() +  " testing console");
-
+            //creating embed format
             embed = new MessageEmbed()
                 .setColor('#0099ff')
                 .setTitle('Discord Member Join Information')
                 .setAuthor("EFSC Bot", dev.displayAvatarURL({ dynamic:true }))
                 .setThumbnail(user2.displayAvatarURL())
                 .addFields(
-                    //{ name: 'Hello', value: 'Hello' },
-                    //{ name: '\u200B', value: '\u200B' },
                     { name: 'Username', value: interaction.options.getMember('target').displayName, inline: false },
                     { name: 'Join date', value: `**${joinedformated}**`, inline: false },
-                    { name: 'guild id', value: `ss`, inline: false }
+                    { name: 'Membership Length', value: `Member for **${totaltimeyear}** years **${adjustedmonths}** months **${adjusteddays}** days **${adjustedhours}** hours`, inline: false }
                 );
 
-            //looks for length of time if 1year+
-            if (totaltimeyear > 0) {
-                interaction.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimeyear} years ${adjustedmonths} months ${adjusteddays} days ${adjustedhours} hours`);
-            }
-
-            //looks for length of time if 1month+
-            else if (totaltimemonth > 0) {
-                interaction.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimemonth} months ${adjusteddays} days ${adjustedhours} hours`)
-            }
-
-            //looks for length of time if 1day+
-            else if (totaltimeday > 0) {
-                interaction.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimeday} days ${adjustedhours} hours`);
-                interaction.reply({ embeds: [embed] });
-            }
-
-            //looks for length of time if 1hour+
-            else if (totaltimehour > 0) {
-                interaction.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimehour} hours`);
-            }
-
-             else {
-
-                interaction.channel.send(`Joined: ${joinedformated}`);
-                interaction.reply({ embeds: [embed] })
-
-            }
-
-
-
-
+            //calls to print embed
+            interaction.reply({ embeds: [embed] });
 
         }
 
@@ -239,7 +190,7 @@ function test() {
 }
 
 //calls TimeConv function
-//TimeConv(user);
+TimeConv(user);
 MentionUser();
 test();
 
