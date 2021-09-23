@@ -15,17 +15,24 @@ client.once('ready', () => {
 });
 
 //Function for how long members have been active
-function TimeConv(user) {
+function TimeConv() {
 
+    //pulls "target" from interaction commands
+    client.on('interactionCreate', interaction => {
+
+        const {commandName} = interaction;
+
+        //looks for mention command
+        if (commandName === 'join') {
 
             //message created timestamp - unix timecode
-            const createdtimestamp = (user.createdTimestamp);
+            const createdtimestamp = (interaction.createdTimestamp);
 
             //author join-date timestamp - unix timecode
-            const joinedtimestamp = (user.member.joinedTimestamp);
+            const joinedtimestamp = (interaction.member.joinedTimestamp);
 
             //formatted time when user joined
-            const joinedformated = moment.utc(user.member.joinedAt);
+            const joinedformated = moment.utc(interaction.member.joinedAt);
 
             //convert unix timecode into hours.
             // /1000 to convert to seconds. /60 converts to minutes. /60 converts to hours. rounds down.
@@ -60,25 +67,28 @@ function TimeConv(user) {
 
             //looks for length of time if 1year+
             if (totaltimeyear > 0) {
-                user.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimeyear} years ${adjustedmonths} months ${adjusteddays} days ${adjustedhours} hours`);
+                interaction.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimeyear} years ${adjustedmonths} months ${adjusteddays} days ${adjustedhours} hours`);
             }
 
             //looks for length of time if 1month+
             else if (totaltimemonth > 0) {
-                user.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimemonth} months ${adjusteddays} days ${adjustedhours} hours`)
+                interaction.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimemonth} months ${adjusteddays} days ${adjustedhours} hours`)
             }
 
             //looks for length of time if 1day+
             else if (totaltimeday > 0) {
-                user.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimeday} days ${adjustedhours} hours`);
+                interaction.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimeday} days ${adjustedhours} hours`);
             }
 
             //looks for length of time if 1hour+
             else if (totaltimehour > 0) {
-                user.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimehour} hours`);
+                interaction.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimehour} hours`);
             } else {
-                user.channel.send(`Joined: ${joinedformated}`);
+                interaction.channel.send(`Joined: ${joinedformated}`);
             }
+        }
+
+    });
 
 }
 
@@ -190,7 +200,7 @@ function test() {
 }
 
 //calls TimeConv function
-TimeConv(user);
+TimeConv();
 MentionUser();
 test();
 
