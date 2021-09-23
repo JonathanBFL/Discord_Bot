@@ -16,6 +16,7 @@ const commands = [
 
 const rest = new REST({ version: '9' }).setToken(token);
 
+//when ran it updates the "slash" commands on the bot
 (async () => {
     try {
         await rest.put(

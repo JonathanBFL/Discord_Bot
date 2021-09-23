@@ -125,6 +125,8 @@ function MentionUser() {
 }
 */
 
+//todo: creeate function for time in use of UserInfo() and role deletion
+
 //Time to put mentions and time together
 function UserInfo() {
     //console command to verify function was called
