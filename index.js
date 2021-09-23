@@ -14,7 +14,8 @@ client.once('ready', () => {
 
 });
 
-//Function for how long members have been active
+/*
+//Function for how long members have been active todo:remove for 1.0.4
 function TimeConv() {
 
     //pulls "target" from interaction commands
@@ -91,8 +92,10 @@ function TimeConv() {
     });
 
 }
+*/
 
-//Function to detect mentioned users
+/*
+//Function to detect mentioned users todo:remove for 1.0.4
 function MentionUser() {
     console.log("function mention");
 
@@ -120,9 +123,10 @@ function MentionUser() {
     });
 
 }
+*/
 
 //Time to put mentions and time together
-function test() {
+function UserInfo() {
     //console command to verify function was called
     console.log("test function running");
 
@@ -134,25 +138,25 @@ function test() {
         const {commandName} = interaction;
 
         //looks for mention command
-        if (commandName === 'test') {
+        if (commandName === 'userinfo') {
 
             //pulls "target" from interaction commands - guildmemberIDs
-            var GuildID = interaction.options.getMember('target');
+            let UserGuildID = interaction.options.getMember('target');
 
             //pulls "target" from interaction commands - userIDS
-            var UserID = interaction.options.getUser('target');
+            let UserID = interaction.options.getUser('target');
 
             //pulls bot userID from cache
-            const dev = client.users.cache.get(clientId)
+            const BotUserId = client.users.cache.get(clientId)
+
+            //fetches guild object
+            const GuildName = client.guilds.cache.get(guildId);
 
             //message created timestamp - unix timecode
             const createdtimestamp = (interaction.createdTimestamp);
 
             //author join-date timestamp - unix timecode
-            const joinedtimestamp = (GuildID.joinedTimestamp);
-
-            //formatted time when user joined
-            const joinedformated = moment.utc(GuildID.joinedAt).format('LLL');
+            const joinedtimestamp = (UserGuildID.joinedTimestamp);
 
             //convert unix timecode into hours.
             // /1000 to convert to seconds. /60 converts to minutes. /60 converts to hours. rounds down.
@@ -178,71 +182,72 @@ function test() {
             //prevents out of bounds var if years are used
             const adjustedmonths = totaltimemonth - (totaltimeyear * 12);
 
-            const spacer = GuildID.roles.cache.filter(r => r.name !== '@everyone').map(role => role.name).join(`▫`);
-
-
-
             //creating embed format
-            embed = new MessageEmbed()
-                .setColor('#0099ff')
+            let MemberInfo = new MessageEmbed()
                 .setTitle('Discord Member Join Information')
-                .setAuthor("EFSC Bot", dev.displayAvatarURL({dynamic: true}))
-                .setThumbnail(UserID.displayAvatarURL())
+                .setAuthor("EFSC Bot", BotUserId.displayAvatarURL({dynamic: true})) //Displays avatar of the bot
+                .setThumbnail(UserID.displayAvatarURL())    //Displays avatar of mentioned user
                 .setTimestamp()
-                .setColor('#007940')
+                .setColor('#007940')    //color of trim EFSC official color
                 .addFields(
                     {
+                        //displays the current username in the server of mentioned user
                         name: 'Nickname',
-                        value: GuildID.displayName,
+                        value: UserGuildID.displayName,
                         inline: true
                     },
+
                     {
+                        //displays the unedited username of mentioned user
                         name: 'Username',
                         value: UserID.tag,
                         inline: true
                     },
 
                     {
+                        //spacer
                         name: '\u200b',
                         value: '\u200b'
                     },
 
-                    /* not needed
                     {
-                        name: 'Joined Our Discord',
-                        value: moment.utc(GuildID.joinedAt).format('LLL'),
+                        //date mentioned user joined the server
+                        name: `Joined ${GuildName}`,
+                        value: moment.utc(UserGuildID.joinedAt).format('LLL'),
                         inline: true
                     },
-                    */
 
+                    /* not needed todo:remove for 1.0.4
                     {
                         name: 'Joined Discord',
                         value: moment(UserID.createdAt, "YYYYMMDD").fromNow(),
                         inline: true
                     },
+                     */
 
                     {
+                        //displays the current roles of the mentioned user
                         name: 'Roles:',
-                        value: GuildID.roles.cache.filter(r => r.name !== '@everyone').map(role => role.name).join(` **|** `),
+                        value: UserGuildID.roles.cache.filter(r => r.name !== '@everyone').map(role => role.name).join(` **|** `),
                         inline: true
                     },
 
                     {
+                        //spacer
                         name: '\u200b',
                         value: '\u200b'
                     },
 
                     {
+                        //total time the user has been a member in the server
                         name: 'Membership Length',
                         value: `Member for **${totaltimeyear}** years **${adjustedmonths}** months **${adjusteddays}** days **${adjustedhours}** hours`
                     }
                 )
-                .setFooter('Eastern State Florida Cyber Team', dev.displayAvatarURL({dynamic: true}));
-
-
+                .setFooter('Eastern State Florida Cyber Team', BotUserId.displayAvatarURL({dynamic: true}));    //displays bots avatar
 
             //calls to print embed
-            interaction.reply({embeds: [embed]});
+            interaction.reply({embeds: [MemberInfo]});
 
         }
 
@@ -251,9 +256,9 @@ function test() {
 }
 
 //calls TimeConv function
-TimeConv();
-MentionUser();
-test();
+//TimeConv(); todo:remove for 1.0.4
+//MentionUser(); todo:remove for 1.0.4
+UserInfo();
 
 // Login to Discord with your client's token
 client.login(token);

@@ -4,19 +4,13 @@ const { Routes } = require('discord-api-types/v9');
 const { clientId, guildId, token } = require('./config.json');
 
 const commands = [
-    new SlashCommandBuilder().setName('join').setDescription('Replies with user join info!'),
-    new SlashCommandBuilder().setName('mention').setDescription('A test function for mentions'),
     new SlashCommandBuilder()
-        .setName('test') //names the command
-        .setDescription('Get the avatar URL of the selected user, or your own avatar.')
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('mention')
-                .setDescription('Info about a user')
-                .addUserOption(option => option
-                    .setRequired(true)
-                    .setName('target')
-                    .setDescription('The user'))),//give description
+        .setName('userinfo')    //names the command
+        .setDescription('Get the information of a member.')
+        .addUserOption(option => option
+            .setRequired(true)  //requires mention input
+            .setName('target')  //mentioned user var
+            .setDescription('The user')),   //give description
 ]
     .map(command => command.toJSON());
 
