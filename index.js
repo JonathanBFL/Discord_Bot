@@ -137,10 +137,10 @@ function test() {
         if (commandName === 'test') {
 
             //pulls "target" from interaction commands - guildmemberIDs
-            const user = interaction.options.getMember('target');
+            var GuildID = interaction.options.getMember('target');
 
             //pulls "target" from interaction commands - userIDS
-            const user2 = interaction.options.getUser('target');
+            var UserID = interaction.options.getUser('target');
 
             //pulls bot userID from cache
             const dev = client.users.cache.get(clientId)
@@ -149,10 +149,10 @@ function test() {
             const createdtimestamp = (interaction.createdTimestamp);
 
             //author join-date timestamp - unix timecode
-            const joinedtimestamp = (user.joinedTimestamp);
+            const joinedtimestamp = (GuildID.joinedTimestamp);
 
             //formatted time when user joined
-            const joinedformated = moment.utc(user.joinedAt).format('LLL');
+            const joinedformated = moment.utc(GuildID.joinedAt).format('LLL');
 
             //convert unix timecode into hours.
             // /1000 to convert to seconds. /60 converts to minutes. /60 converts to hours. rounds down.
@@ -178,31 +178,67 @@ function test() {
             //prevents out of bounds var if years are used
             const adjustedmonths = totaltimemonth - (totaltimeyear * 12);
 
+            const spacer = GuildID.roles.cache.filter(r => r.name !== '@everyone').map(role => role.name).join(`▫`);
+
+
+
             //creating embed format
             embed = new MessageEmbed()
                 .setColor('#0099ff')
                 .setTitle('Discord Member Join Information')
                 .setAuthor("EFSC Bot", dev.displayAvatarURL({dynamic: true}))
-                .setThumbnail(user2.displayAvatarURL())
+                .setThumbnail(UserID.displayAvatarURL())
                 .setTimestamp()
                 .setColor('#007940')
                 .addFields(
-                    {name: 'Nickname', value: interaction.options.getMember('target').displayName, inline: true},
-                    {name: 'Username', value: interaction.options.getUser('target').tag, inline: true},
-                    {name: '\u200b', value: '\u200b'},
-                    {name: 'Joined Our Discord', value: moment.utc(user.joinedAt).format('LLL'), inline: true},
                     {
-                        name: 'Joined Discord',
-                        value: moment(interaction.options.getUser('target').createdAt, "YYYYMMDD").fromNow(),
+                        name: 'Nickname',
+                        value: GuildID.displayName,
                         inline: true
                     },
-                    {name: '\u200b', value: '\u200b'},
+                    {
+                        name: 'Username',
+                        value: UserID.tag,
+                        inline: true
+                    },
+
+                    {
+                        name: '\u200b',
+                        value: '\u200b'
+                    },
+
+                    /* not needed
+                    {
+                        name: 'Joined Our Discord',
+                        value: moment.utc(GuildID.joinedAt).format('LLL'),
+                        inline: true
+                    },
+                    */
+
+                    {
+                        name: 'Joined Discord',
+                        value: moment(UserID.createdAt, "YYYYMMDD").fromNow(),
+                        inline: true
+                    },
+
+                    {
+                        name: 'Roles:',
+                        value: GuildID.roles.cache.filter(r => r.name !== '@everyone').map(role => role.name).join(` **|** `),
+                        inline: true
+                    },
+
+                    {
+                        name: '\u200b',
+                        value: '\u200b'
+                    },
+
                     {
                         name: 'Membership Length',
                         value: `Member for **${totaltimeyear}** years **${adjustedmonths}** months **${adjusteddays}** days **${adjustedhours}** hours`
                     }
                 )
                 .setFooter('Eastern State Florida Cyber Team', dev.displayAvatarURL({dynamic: true}));
+
 
 
             //calls to print embed
