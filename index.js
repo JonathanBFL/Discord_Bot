@@ -4,134 +4,140 @@ const {token, guildId, clientId} = require('./config.json');
 const moment = require("moment");
 
 // Create a new client instance
-const client = new Client({intents: [Intents.FLAGS.GUILDS]});
+const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS]});
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
 
     //prints in console the bot is ready.
-    console.log('Ready!');
+    console.log(`I am ready! Logged in as ${client.user.tag}!`);
+    console.log(`Bot has started, with ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} guilds.\n`);
+
+    //calls functions
+    UserInfo();
+
+
+    //todo: enable for 1.0.4
+    //NewRole();
 
 });
 
+//todo: create function for time in use of UserInfo() and role deletion
+//todo: enable for 1.0.4
 /*
-//Function for how long members have been active todo:remove for 1.0.4
-function TimeConv() {
+function NewRole(){
 
-    //pulls "target" from interaction commands
-    client.on('interactionCreate', interaction => {
-
-        const {commandName} = interaction;
-
-        //looks for mention command
-        if (commandName === 'join') {
-
-            //message created timestamp - unix timecode
-            const createdtimestamp = (interaction.createdTimestamp);
-
-            //author join-date timestamp - unix timecode
-            const joinedtimestamp = (interaction.member.joinedTimestamp);
-
-            //formatted time when user joined
-            const joinedformated = moment.utc(interaction.member.joinedAt);
-
-            //convert unix timecode into hours.
-            // /1000 to convert to seconds. /60 converts to minutes. /60 converts to hours. rounds down.
-            const totaltimehour = Math.floor((createdtimestamp - joinedtimestamp) / 1000 / 60 / 60);
-            console.log(totaltimehour);
-
-            // /24 converts hours to days - rounds down.
-            const totaltimeday = Math.floor(totaltimehour / 24);
-            console.log(totaltimeday);
-
-            // Subtract total number days off total number of hours
-            //prevents out of bounds var if days/weeks/months/years are used
-            const adjustedhours = totaltimehour - (totaltimeday * 24);
-            console.log(adjustedhours);
-
-            //Months uses 30 days as a month todo: fix month usage
-            const totaltimemonth = Math.floor(totaltimeday / 30);
-            console.log(totaltimemonth);
-
-            //takes total days subtracted by (num. of months * 30)
-            //prevents out of bounds var if weeks/months/years are used
-            const adjusteddays = totaltimeday - (totaltimemonth * 30);
-            console.log(adjusteddays);
-
-            //takes total days divided by 365 to get years
-            const totaltimeyear = Math.floor(totaltimeday / 365);
-            console.log(totaltimeyear);
-
-            //prevents out of bounds var if years are used
-            const adjustedmonths = totaltimemonth - (totaltimeyear * 12);
-            console.log(adjustedmonths);
-
-            //looks for length of time if 1year+
-            if (totaltimeyear > 0) {
-                interaction.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimeyear} years ${adjustedmonths} months ${adjusteddays} days ${adjustedhours} hours`);
-            }
-
-            //looks for length of time if 1month+
-            else if (totaltimemonth > 0) {
-                interaction.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimemonth} months ${adjusteddays} days ${adjustedhours} hours`)
-            }
-
-            //looks for length of time if 1day+
-            else if (totaltimeday > 0) {
-                interaction.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimeday} days ${adjustedhours} hours`);
-            }
-
-            //looks for length of time if 1hour+
-            else if (totaltimehour > 0) {
-                interaction.channel.send(`Joined: ${joinedformated}\nMember for ${totaltimehour} hours`);
-            } else {
-                interaction.channel.send(`Joined: ${joinedformated}`);
-            }
-        }
-
-    });
-
-}
-*/
-
-/*
-//Function to detect mentioned users todo:remove for 1.0.4
-function MentionUser() {
-    console.log("function mention");
-
-    client.on('interactionCreate', interaction => {
-
-        //returns if no command
-        if (!interaction.isCommand()) return;
-
-        const {commandName} = interaction;
-
-        //looks for mention command
-        if (commandName === 'mention') {
-
-            //pulls "target" from interaction commands
-            const user = interaction.options.getUser('target');
-
-            // if  true return message
-            if (user) return interaction.reply(`${user.username}'s avatar: ${user.displayAvatarURL({dynamic: true})}`);
-
-            // if  true false message
-            return interaction.reply(`Your avatar: ${interaction.user.displayAvatarURL({dynamic: true})}`);
-
-        }
-
-    });
-
-}
-*/
-
-//todo: creeate function for time in use of UserInfo() and role deletion
-
-//Time to put mentions and time together
-function UserInfo() {
     //console command to verify function was called
-    console.log("test function running");
+    console.log("NewRole function running\n");
 
+    //fetches the complete cache - useful for getting data when bot was offline
+    client.guilds.cache.get(guildId).members.fetch();
+    client.guilds.cache.get(guildId).roles.fetch();
+
+    //Loops commands
+    setInterval(() => {
+
+        //Get guilds cache
+        const guild = client.guilds.cache.get(guildId);
+
+        //finds each member with role "Bots" todo: change to final role
+        const members = guild.members.cache.filter(member => member.roles.cache.find(role => role.name === `Bots`)).map(member => member.displayName).join(` **|** `);
+
+        //print each member into the console.
+        console.log(members + "\n");
+
+        //set bot Activity
+        client.user.setActivity("testing");
+
+        //TESTING BELOW//
+
+        //Creates map of members with role 'Bots'
+        const map1 = guild.members.cache.filter(member => member.roles.cache.find(role => role.name === `Bots`));
+        console.log(map1.size);
+
+        //defines the iterator
+        const iterator1 = map1.keys();
+
+        //for loop the size of the map
+        for (let i = 0; i < map1.size; i++) {
+
+            //User ID - iterates through the map
+            let UID = iterator1.next().value;
+
+            //Get Guild ID of User ID
+            let UserGuildID = guild.members.cache.get(UID)
+
+            //send to function calcDate
+            let days = calcDate(UserGuildID);
+
+            //checks if user is older than 60 days
+            if (days.totaltimeday > 60) {
+                //todo: remove roles here
+                console.log("user is 60 days old")
+            }
+
+        }
+
+        //TESTING ABOVE//
+
+        //sets interval to 5 seconds todo: slow down for performance
+    }, 1 * 5000);
+
+}
+*/
+
+//Date calculation for users
+function calcDate(UserGuildID){
+
+    //Gets current time
+    const createdtimestamp = (Date.now());
+
+    //author join-date timestamp - unix timecode
+    const joinedtimestamp = (UserGuildID.joinedTimestamp);
+
+    //convert unix timecode into hours.
+    // /1000 to convert to seconds. /60 converts to minutes. /60 converts to hours. rounds down.
+    const totaltimehour = Math.floor((createdtimestamp - joinedtimestamp) / 1000 / 60 / 60);
+
+    // /24 converts hours to days - rounds down.
+    const totaltimeday = Math.floor(totaltimehour / 24);
+
+    // Subtract total number days off total number of hours
+    //prevents out of bounds var if days/weeks/months/years are used
+    const adjustedhours = totaltimehour - (totaltimeday * 24);
+
+    //Months uses 30 days as a month todo: fix month usage
+    const totaltimemonth = Math.floor(totaltimeday / 30);
+
+    //takes total days subtracted by (num. of months * 30)
+    //prevents out of bounds var if weeks/months/years are used
+    const adjusteddays = totaltimeday - (totaltimemonth * 30);
+
+    //takes total days divided by 365 to get years
+    const totaltimeyear = Math.floor(totaltimeday / 365);
+
+    //prevents out of bounds var if years are used
+    const adjustedmonths = totaltimemonth - (totaltimeyear * 12);
+
+    //returns variables
+    return {
+        createdtimestamp,
+        joinedtimestamp,
+        totaltimehour,
+        totaltimeday,
+        adjustedhours,
+        totaltimemonth,
+        adjusteddays,
+        totaltimeyear,
+        adjustedmonths,
+    };
+
+}
+
+//retreives User information and send an embed message
+function UserInfo() {
+
+    //listens for interactions (slash commands)
     client.on('interactionCreate', interaction => {
 
         //returns if no command
@@ -154,35 +160,8 @@ function UserInfo() {
             //fetches guild object
             const GuildName = client.guilds.cache.get(guildId);
 
-            //message created timestamp - unix timecode
-            const createdtimestamp = (interaction.createdTimestamp);
-
-            //author join-date timestamp - unix timecode
-            const joinedtimestamp = (UserGuildID.joinedTimestamp);
-
-            //convert unix timecode into hours.
-            // /1000 to convert to seconds. /60 converts to minutes. /60 converts to hours. rounds down.
-            const totaltimehour = Math.floor((createdtimestamp - joinedtimestamp) / 1000 / 60 / 60);
-
-            // /24 converts hours to days - rounds down.
-            const totaltimeday = Math.floor(totaltimehour / 24);
-
-            // Subtract total number days off total number of hours
-            //prevents out of bounds var if days/weeks/months/years are used
-            const adjustedhours = totaltimehour - (totaltimeday * 24);
-
-            //Months uses 30 days as a month todo: fix month usage
-            const totaltimemonth = Math.floor(totaltimeday / 30);
-
-            //takes total days subtracted by (num. of months * 30)
-            //prevents out of bounds var if weeks/months/years are used
-            const adjusteddays = totaltimeday - (totaltimemonth * 30);
-
-            //takes total days divided by 365 to get years
-            const totaltimeyear = Math.floor(totaltimeday / 365);
-
-            //prevents out of bounds var if years are used
-            const adjustedmonths = totaltimemonth - (totaltimeyear * 12);
+            //Calls calc date function
+            let jointime = calcDate(UserGuildID);
 
             //creating embed format
             let MemberInfo = new MessageEmbed()
@@ -214,18 +193,10 @@ function UserInfo() {
 
                     {
                         //date mentioned user joined the server
-                        name: `Joined ${GuildName}`,
+                        name: `Joined **${GuildName}**`,
                         value: moment.utc(UserGuildID.joinedAt).format('LLL'),
                         inline: true
                     },
-
-                    /* not needed todo:remove for 1.0.4
-                    {
-                        name: 'Joined Discord',
-                        value: moment(UserID.createdAt, "YYYYMMDD").fromNow(),
-                        inline: true
-                    },
-                     */
 
                     {
                         //displays the current roles of the mentioned user
@@ -243,7 +214,7 @@ function UserInfo() {
                     {
                         //total time the user has been a member in the server
                         name: 'Membership Length',
-                        value: `Member for **${totaltimeyear}** years **${adjustedmonths}** months **${adjusteddays}** days **${adjustedhours}** hours`
+                        value: `Member for **${jointime.totaltimeyear}** years **${jointime.adjustedmonths}** months **${jointime.adjusteddays}** days **${jointime.adjustedhours}** hours`
                     }
                 )
                 .setFooter('Eastern State Florida Cyber Team', BotUserId.displayAvatarURL({dynamic: true}));    //displays bots avatar
@@ -256,11 +227,6 @@ function UserInfo() {
     });
 
 }
-
-//calls TimeConv function
-//TimeConv(); todo:remove for 1.0.4
-//MentionUser(); todo:remove for 1.0.4
-UserInfo();
 
 // Login to Discord with your client's token
 client.login(token);
