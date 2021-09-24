@@ -18,13 +18,12 @@ client.once('ready', () => {
 
 
     //todo: enable for 1.0.4
-    //NewRole();
+    NewRole();
 
 });
 
 //todo: create function for time in use of UserInfo() and role deletion
 //todo: enable for 1.0.4
-/*
 function NewRole(){
 
     //console command to verify function was called
@@ -84,7 +83,6 @@ function NewRole(){
     }, 1 * 5000);
 
 }
-*/
 
 //Date calculation for users
 function calcDate(UserGuildID){
