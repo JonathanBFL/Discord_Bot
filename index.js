@@ -1,12 +1,15 @@
 // Require the necessary discord.js classes
 const {Client, Intents, MessageEmbed} = require('discord.js');
-const {token, guildId, clientId, testrole} = require('./config.json');
+const {token, guildId, clientId} = require('./config.json');
+
+//import moment module
 const moment = require("moment");
+
+// import fs module in which writeFile function is defined.
+const fsLibrary  = require('fs');
 
 // Create a new client instance
 const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS]});
-
-//todo: create a fetch command to listen for a role to input
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
@@ -18,7 +21,7 @@ client.once('ready', () => {
     //set bot Activity
     client.user.setActivity("testing");
 
-    //set a 5 second delay before functions are called - gives time to fetch caches
+    //set a 1 second delay before functions are called - gives time to fetch caches
     setTimeout(() => {
 
         //prints in console the bot is ready.
@@ -27,21 +30,16 @@ client.once('ready', () => {
         console.log(`${client.user.username} is ready to spy!\n`);
 
         //calls functions
-        UserInfo();
-        CheckRole();
+        Interaction();
+        CheckRoleLoop();
 
-        //5 second delay
-    }, 5 * 1000)
+        //1 second delay
+    }, 1000)
 
 });
 
-function CheckRole() {
-
-    //Get guilds cache
-    const guild = client.guilds.cache.get(guildId);
-
-    //grabs role
-    const role2 = guild.roles.cache.get(testrole);
+//checks for users role - contains loop to refresh cache
+function CheckRoleLoop() {
 
     //call function
     loop();
@@ -49,14 +47,23 @@ function CheckRole() {
     //Loops commands
     function loop() {
 
+        //Calls for an uncached retrieval of roleID
+        const {roleID} = requireUncached('./roleconfig.json');
+
+        //Get guilds cache
+        const guild = client.guilds.cache.get(guildId);
+
+        //grabs role
+        let UserRole = guild.roles.cache.get(roleID);
+
         //finds each member with role "test"
-        const members = guild.members.cache.filter(member => member.roles.cache.find(role => role.id === testrole)).map(member => member.displayName).join(` | `);
+        let RoleMembers = guild.members.cache.filter(member => member.roles.cache.find(role => role.id === roleID)).map(member => member.displayName).join(` | `);
 
         //Creates map of members with role 'test'
-        const map1 = guild.members.cache.filter(member => member.roles.cache.find(role => role.id === testrole));
+        let map1 = guild.members.cache.filter(member => member.roles.cache.find(role => role.id === roleID));
 
         //prints to console how many members have the role and a list of the members
-        console.log(`${map1.size} users with role (${role2.name}):\n${members}\n`)
+        console.log(`${map1.size} users with role (${UserRole.name}):\n${RoleMembers}\n`)
 
         //defines the iterator
         const iterator1 = map1.keys();
@@ -77,16 +84,16 @@ function CheckRole() {
             if (days.totaltimeday > 60) {
 
                 //adds roleID variable
-                let role = UserGuildID.guild.roles.cache.get(testrole);
+                let UserRoleID = UserGuildID.guild.roles.cache.get(roleID);
 
                 //if user has role run
-                if (UserGuildID.roles.cache.has(testrole)) {
+                if (UserGuildID.roles.cache.has(roleID)) {
 
                     //adds role
-                    UserGuildID.roles.remove(testrole);
+                    UserGuildID.roles.remove(roleID);
 
                     //prints to console
-                    console.log(`${UserGuildID.displayName} was removed from role: ${role.name}`)
+                    console.log(`${UserGuildID.displayName} was removed from role: ${UserRoleID.name}`)
 
                 }
 
@@ -99,8 +106,13 @@ function CheckRole() {
 
         }
 
+        function requireUncached(module) {
+            delete require.cache[require.resolve(module)];
+            return require(module);
+        }
+
         //sets interval to 30 seconds todo: slow down for performance
-        setTimeout(loop, 30 * 1000);
+        setTimeout(loop, 1 * 1000);
     }
 
 }
@@ -154,7 +166,7 @@ function calcDate(UserGuildID) {
 }
 
 //retreives User information and send an embed message
-function UserInfo() {
+function Interaction() {
 
     //listens for interactions (slash commands)
     client.on('interactionCreate', interaction => {
@@ -164,6 +176,12 @@ function UserInfo() {
 
         const {commandName} = interaction;
 
+        //pulls bot userID from cache
+        const BotUserId = client.users.cache.get(clientId)
+
+        //fetches guild object
+        const GuildName = client.guilds.cache.get(guildId);
+
         //looks for mention command
         if (commandName === 'userinfo') {
 
@@ -172,12 +190,6 @@ function UserInfo() {
 
             //pulls "target" from interaction commands - userIDS
             let UserID = interaction.options.getUser('target');
-
-            //pulls bot userID from cache
-            const BotUserId = client.users.cache.get(clientId)
-
-            //fetches guild object
-            const GuildName = client.guilds.cache.get(guildId);
 
             //Calls calc date function
             let jointime = calcDate(UserGuildID);
@@ -240,6 +252,40 @@ function UserInfo() {
 
             //calls to print embed
             interaction.reply({embeds: [MemberInfo]});
+
+        }
+
+        //looks for new member role command
+        if (commandName === 'newmemberroles'){
+
+            //data which will need to add in a file.
+            let RoleInfo = interaction.options.getRole('role');
+            console.log(RoleInfo);
+
+            //formats data
+            let roleid = `{\n"roleID": "${RoleInfo.id}"\n}`
+
+            //write data in 'roleconfig.json'.
+            fsLibrary.writeFile('roleconfig.json', roleid, (error) => {
+
+            })
+
+        }
+
+        //looks for welcome channel commands todo: create the welcome message when selected
+        if (commandName === 'welcomechannel'){
+
+            //data which will need to add in a file.
+            let ChannelInfo = interaction.options.getChannel('channel');
+            console.log(ChannelInfo);
+
+            //formats data
+            let channelID = `{\n"channelID": "${ChannelInfo.id}"\n}`
+
+            //write data in 'channelconfig.json'.
+            fsLibrary.writeFile('channelconfig.json', channelID, (error) => {
+
+            })
 
         }
 
