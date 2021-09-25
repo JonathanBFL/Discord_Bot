@@ -1,58 +1,62 @@
 // Require the necessary discord.js classes
 const {Client, Intents, MessageEmbed} = require('discord.js');
-const {token, guildId, clientId} = require('./config.json');
+const {token, guildId, clientId, testrole} = require('./config.json');
 const moment = require("moment");
 
 // Create a new client instance
 const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS]});
 
+//todo: create a fetch command to listen for a role to input
+
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
-
-    //prints in console the bot is ready.
-    console.log(`I am ready! Logged in as ${client.user.tag}!`);
-    console.log(`Bot has started, with ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} guilds.\n`);
-
-    //calls functions
-    UserInfo();
-
-
-    //todo: enable for 1.0.4
-    NewRole();
-
-});
-
-//todo: create function for time in use of UserInfo() and role deletion
-//todo: enable for 1.0.4
-function NewRole(){
-
-    //console command to verify function was called
-    console.log("NewRole function running\n");
 
     //fetches the complete cache - useful for getting data when bot was offline
     client.guilds.cache.get(guildId).members.fetch();
     client.guilds.cache.get(guildId).roles.fetch();
 
+    //set bot Activity
+    client.user.setActivity("testing");
+
+    //set a 5 second delay before functions are called - gives time to fetch caches
+    setTimeout(() => {
+
+        //prints in console the bot is ready.
+        console.log(`\nLogged in as ${client.user.tag}.`);
+        console.log(`Monitoring ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} servers.`);
+        console.log(`${client.user.username} is ready to spy!\n`);
+
+        //calls functions
+        UserInfo();
+        CheckRole();
+
+        //5 second delay
+    }, 5 * 1000)
+
+});
+
+function CheckRole() {
+
+    //Get guilds cache
+    const guild = client.guilds.cache.get(guildId);
+
+    //grabs role
+    const role2 = guild.roles.cache.get(testrole);
+
+    //call function
+    loop();
+
     //Loops commands
-    setInterval(() => {
+    function loop() {
 
-        //Get guilds cache
-        const guild = client.guilds.cache.get(guildId);
+        //finds each member with role "test"
+        const members = guild.members.cache.filter(member => member.roles.cache.find(role => role.id === testrole)).map(member => member.displayName).join(` | `);
 
-        //finds each member with role "Bots" todo: change to final role
-        const members = guild.members.cache.filter(member => member.roles.cache.find(role => role.name === `Bots`)).map(member => member.displayName).join(` **|** `);
+        //Creates map of members with role 'test'
+        const map1 = guild.members.cache.filter(member => member.roles.cache.find(role => role.id === testrole));
 
-        //print each member into the console.
-        console.log(members + "\n");
-
-        //set bot Activity
-        client.user.setActivity("testing");
-
-        //TESTING BELOW//
-
-        //Creates map of members with role 'Bots'
-        const map1 = guild.members.cache.filter(member => member.roles.cache.find(role => role.name === `Bots`));
-        console.log(map1.size);
+        //prints to console how many members have the role and a list of the members
+        console.log(`${map1.size} users with role (${role2.name}):\n${members}\n`)
 
         //defines the iterator
         const iterator1 = map1.keys();
@@ -71,21 +75,38 @@ function NewRole(){
 
             //checks if user is older than 60 days
             if (days.totaltimeday > 60) {
-                //todo: remove roles here
-                console.log("user is 60 days old")
+
+                //adds roleID variable
+                let role = UserGuildID.guild.roles.cache.get(testrole);
+
+                //if user has role run
+                if (UserGuildID.roles.cache.has(testrole)) {
+
+                    //adds role
+                    UserGuildID.roles.remove(testrole);
+
+                    //prints to console
+                    console.log(`${UserGuildID.displayName} was removed from role: ${role.name}`)
+
+                }
+
+                //if user does not have role
+                else {
+
+                }
+
             }
 
         }
 
-        //TESTING ABOVE//
-
-        //sets interval to 5 seconds todo: slow down for performance
-    }, 1 * 5000);
+        //sets interval to 30 seconds todo: slow down for performance
+        setTimeout(loop, 30 * 1000);
+    }
 
 }
 
 //Date calculation for users
-function calcDate(UserGuildID){
+function calcDate(UserGuildID) {
 
     //Gets current time
     const createdtimestamp = (Date.now());
