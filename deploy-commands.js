@@ -5,6 +5,22 @@ const { clientId, guildId, token } = require('./config.json');
 
 const commands = [
     new SlashCommandBuilder()
+        .setName('welcomechannel')    //names the command
+        .setDescription('Sets the channel for welcome message')
+        .addChannelOption(option => option
+            .setRequired(true)  //requires mention input
+            .setName('channel')  //mentioned user var
+            .setDescription('The channel')),   //give description
+
+    new SlashCommandBuilder()
+        .setName('newmemberroles')
+        .setDescription('Sets the role for new members')
+        .addRoleOption(option => option
+            .setRequired(true)  //requires mention input
+            .setName('role')  //mentioned user var
+            .setDescription('The role')),   //give description
+
+    new SlashCommandBuilder()
         .setName('userinfo')    //names the command
         .setDescription('Get the information of a member.')
         .addUserOption(option => option
