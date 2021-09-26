@@ -1,5 +1,5 @@
 // Require the necessary discord.js classes
-const {Client, Intents, MessageEmbed} = require('discord.js');
+const {Client, Intents, MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 const {token, guildId, clientId} = require('./config.json');
 
 //import moment module
@@ -9,7 +9,9 @@ const moment = require("moment");
 const fsLibrary  = require('fs');
 
 // Create a new client instance
-const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS]});
+const client = new Client({
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS,Intents.FLAGS.GUILD_MESSAGE_REACTIONS,Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS],
+});
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
@@ -17,6 +19,7 @@ client.once('ready', () => {
     //fetches the complete cache - useful for getting data when bot was offline
     client.guilds.cache.get(guildId).members.fetch();
     client.guilds.cache.get(guildId).roles.fetch();
+
 
     //set bot Activity
     client.user.setActivity("testing");
@@ -174,7 +177,7 @@ function Interaction() {
     client.on('interactionCreate', async interaction => {
 
         //returns if no command
-        if (!interaction.isCommand()) return;
+        //if (!interaction.isCommand()) return;
 
         const {commandName} = interaction;
 
@@ -183,6 +186,37 @@ function Interaction() {
 
         //fetches guild object
         const guild_Id = client.guilds.cache.get(guildId);
+
+        //Button for confirming rules are read
+        if (interaction.isButton()){
+
+            const {roleId} = requireUncached('./roleconfig.json');
+
+            //Get guilds cache
+            const guild_Id = client.guilds.cache.get(guildId);
+
+            //grabs role
+            let role_Id = guild_Id.roles.cache.get(roleId);
+
+            //print they reacted
+            if (interaction.member.roles.cache.has(role_Id.id)){
+
+                //prints confirmation
+                interaction.reply(`Don't be silly, you already read the rules <@${interaction.user.id}>!`);
+
+            }
+
+            //print they already reacted
+            else{
+
+                interaction.member.roles.add(role_Id);
+
+                //prints confirmation
+                interaction.reply(`Thank you for reading the rules <@${interaction.user.id}>!`);
+
+            }
+
+        }
 
         //looks for mention command
         if (commandName === 'userinfo') {
@@ -294,6 +328,17 @@ function Interaction() {
 
                 })
 
+                //create button style
+                const button = new MessageActionRow()
+                    .addComponents(
+                        new MessageButton()
+                            .setStyle("DANGER")
+                            .setCustomId('RuleButton')
+                            .setLabel('I have read the rules')
+                            .setEmoji('🧾'),
+                    );
+
+                //create embed style
                 let WelcomeMessage_Embed = new MessageEmbed()
                     .setTitle(':warning: __**EFSC Discord Rules**__ :warning:')
                     .setAuthor("EFSC Bot", client_Id.displayAvatarURL({dynamic: true})) //Displays avatar of the bot
@@ -304,18 +349,16 @@ function Interaction() {
                         "**3**. Do not spam chat.\n" +
                         "**4**. Treat everyone with respect.\n" +
                         "**5**. Racism and sexism will not be tolerated.\n" +
-                        "**6**. Avoid political discussions.\n\n" +
-                        "**Please react with :thumbsup: to confirm you have read and understand the rules**")
+                        "**6**. Avoid political discussions.")
                     .setTimestamp()
                     .setColor('#007940')    //color of trim EFSC official color
                     .setFooter('Eastern State Florida Cyber Team', client_Id.displayAvatarURL({dynamic: true}));    //displays bots avatar
 
                 //sends the embed to the channel
-                const welcomemessage = await client.channels.cache.get(channel_Info.id).send({embeds: [WelcomeMessage_Embed]});
-                welcomemessage.react('👍');
+                const message = await client.channels.cache.get(channel_Info.id).send({embeds: [WelcomeMessage_Embed], components: [button]});
 
                 //finds the message id of sent message
-                let welcomemessage_Id = welcomemessage.id;
+                let welcomemessage_Id = message.id;
                 console.log(welcomemessage_Id);
 
                 //informs the user of the channel it was created in.
@@ -330,9 +373,6 @@ function Interaction() {
 
             }
 
-            /*
-            todo: add reactionrole function for created message
-            */
         }
 
     });
