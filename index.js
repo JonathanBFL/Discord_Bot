@@ -48,52 +48,49 @@ function CheckRoleLoop() {
     function loop() {
 
         //Calls for an uncached retrieval of roleID
-        const {roleID} = requireUncached('./roleconfig.json');
+        const {roleId} = requireUncached('./roleconfig.json');
 
         //Get guilds cache
-        const guild = client.guilds.cache.get(guildId);
+        const guild_Id = client.guilds.cache.get(guildId);
 
         //grabs role
-        let UserRole = guild.roles.cache.get(roleID);
+        let role_Id = guild_Id.roles.cache.get(roleId);
 
         //finds each member with role "test"
-        let RoleMembers = guild.members.cache.filter(member => member.roles.cache.find(role => role.id === roleID)).map(member => member.displayName).join(` | `);
+        let RoleMembers_map = guild_Id.members.cache.filter(member => member.roles.cache.find(role => role.id === roleId)).map(member => member.displayName).join(` | `);
 
-        //Creates map of members with role 'test'
-        let map1 = guild.members.cache.filter(member => member.roles.cache.find(role => role.id === roleID));
+        //Creates map of members with role
+        let role_map = guild_Id.members.cache.filter(member => member.roles.cache.find(role => role.id === roleId));
 
         //prints to console how many members have the role and a list of the members
-        console.log(`${map1.size} users with role (${UserRole.name}):\n${RoleMembers}\n`)
+        console.log(`${role_map.size} users with role (${role_Id.name}):\n${RoleMembers_map}\n`)
 
         //defines the iterator
-        const iterator1 = map1.keys();
+        const iterator1 = role_map.keys();
 
         //for loop the size of the map
-        for (let i = 0; i < map1.size; i++) {
+        for (let i = 0; i < role_map.size; i++) {
 
             //User ID - iterates through the map
-            let UID = iterator1.next().value;
+            let user_Id = iterator1.next().value;
 
             //Get Guild ID of User ID
-            let UserGuildID = guild.members.cache.get(UID)
+            let User_GuildId = guild_Id.members.cache.get(user_Id)
 
-            //send to function calcDate
-            let days = calcDate(UserGuildID);
-
-            //checks if user is older than 60 days
-            if (days.totaltimeday > 60) {
+            //checks if user is older than 60 days by calling calcdate()
+            if (calcDate(User_GuildId).GuildDays > 60) {
 
                 //adds roleID variable
-                let UserRoleID = UserGuildID.guild.roles.cache.get(roleID);
+                let User_RoleId = User_GuildId.guild.roles.cache.get(roleId);
 
                 //if user has role run
-                if (UserGuildID.roles.cache.has(roleID)) {
+                if (User_GuildId.roles.cache.has(roleId)) {
 
                     //adds role
-                    UserGuildID.roles.remove(roleID);
+                    User_GuildId.roles.remove(roleId);
 
                     //prints to console
-                    console.log(`${UserGuildID.displayName} was removed from role: ${UserRoleID.name}`)
+                    console.log(`${User_GuildId.displayName} was removed from role: ${User_RoleId.name}`)
 
                 }
 
@@ -106,14 +103,19 @@ function CheckRoleLoop() {
 
         }
 
-        function requireUncached(module) {
-            delete require.cache[require.resolve(module)];
-            return require(module);
-        }
-
         //sets interval to 30 seconds todo: slow down for performance
         setTimeout(loop, 1 * 1000);
+
     }
+
+}
+
+//function to delete caches
+function requireUncached(module) {
+
+    delete require.cache[require.resolve(module)];
+
+    return require(module);
 
 }
 
@@ -121,46 +123,46 @@ function CheckRoleLoop() {
 function calcDate(UserGuildID) {
 
     //Gets current time
-    const createdtimestamp = (Date.now());
+    const TimestampNow = (Date.now());
 
     //author join-date timestamp - unix timecode
-    const joinedtimestamp = (UserGuildID.joinedTimestamp);
+    const TimestampJoinedGuild = (UserGuildID.joinedTimestamp);
 
     //convert unix timecode into hours.
     // /1000 to convert to seconds. /60 converts to minutes. /60 converts to hours. rounds down.
-    const totaltimehour = Math.floor((createdtimestamp - joinedtimestamp) / 1000 / 60 / 60);
+    const TotalHours = Math.floor((TimestampNow - TimestampJoinedGuild) / 1000 / 60 / 60);
 
     // /24 converts hours to days - rounds down.
-    const totaltimeday = Math.floor(totaltimehour / 24);
+    const TotalDays = Math.floor(TotalHours / 24);
 
     // Subtract total number days off total number of hours
     //prevents out of bounds var if days/weeks/months/years are used
-    const adjustedhours = totaltimehour - (totaltimeday * 24);
+    const GuildHours = TotalHours - (TotalDays * 24);
 
     //Months uses 30 days as a month todo: fix month usage
-    const totaltimemonth = Math.floor(totaltimeday / 30);
+    const TotalMonths = Math.floor(TotalDays / 30);
 
     //takes total days subtracted by (num. of months * 30)
     //prevents out of bounds var if weeks/months/years are used
-    const adjusteddays = totaltimeday - (totaltimemonth * 30);
+    const GuildDays = TotalDays - (TotalMonths * 30);
 
     //takes total days divided by 365 to get years
-    const totaltimeyear = Math.floor(totaltimeday / 365);
+    const TotalYears = Math.floor(TotalDays / 365);
 
     //prevents out of bounds var if years are used
-    const adjustedmonths = totaltimemonth - (totaltimeyear * 12);
+    const GuildMonths = TotalMonths - (TotalYears * 12);
 
     //returns variables
     return {
-        createdtimestamp,
-        joinedtimestamp,
-        totaltimehour,
-        totaltimeday,
-        adjustedhours,
-        totaltimemonth,
-        adjusteddays,
-        totaltimeyear,
-        adjustedmonths,
+        TimestampNow,
+        TimestampJoinedGuild,
+        TotalHours,
+        TotalDays,
+        GuildHours,
+        TotalMonths,
+        GuildDays,
+        TotalYears,
+        GuildMonths,
     };
 
 }
@@ -177,42 +179,42 @@ function Interaction() {
         const {commandName} = interaction;
 
         //pulls bot userID from cache
-        const BotUserId = client.users.cache.get(clientId)
+        const client_Id = client.users.cache.get(clientId);
 
         //fetches guild object
-        const GuildName = client.guilds.cache.get(guildId);
+        const guild_Id = client.guilds.cache.get(guildId);
 
         //looks for mention command
         if (commandName === 'userinfo') {
 
             //pulls "target" from interaction commands - guildmemberIDs
-            let UserGuildID = interaction.options.getMember('target');
+            let user_GuildId = interaction.options.getMember('target');
 
             //pulls "target" from interaction commands - userIDS
-            let UserID = interaction.options.getUser('target');
+            let user_Id = interaction.options.getUser('target');
 
             //Calls calc date function
-            let jointime = calcDate(UserGuildID);
+            let user_Age = calcDate(user_GuildId);
 
             //creating embed format
             let MemberInfo = new MessageEmbed()
                 .setTitle('Discord Member Join Information')
-                .setAuthor("EFSC Bot", BotUserId.displayAvatarURL({dynamic: true})) //Displays avatar of the bot
-                .setThumbnail(UserID.displayAvatarURL())    //Displays avatar of mentioned user
+                .setAuthor("EFSC Bot", client_Id.displayAvatarURL({dynamic: true})) //Displays avatar of the bot
+                .setThumbnail(user_Id.displayAvatarURL())    //Displays avatar of mentioned user
                 .setTimestamp()
                 .setColor('#007940')    //color of trim EFSC official color
                 .addFields(
                     {
                         //displays the current username in the server of mentioned user
                         name: 'Nickname',
-                        value: UserGuildID.displayName,
+                        value: user_GuildId.displayName,
                         inline: true
                     },
 
                     {
                         //displays the unedited username of mentioned user
                         name: 'Username',
-                        value: UserID.tag,
+                        value: user_Id.tag,
                         inline: true
                     },
 
@@ -224,15 +226,15 @@ function Interaction() {
 
                     {
                         //date mentioned user joined the server
-                        name: `Joined **${GuildName}**`,
-                        value: moment.utc(UserGuildID.joinedAt).format('LLL'),
+                        name: `Joined **${guild_Id}**`,
+                        value: moment.utc(user_GuildId.joinedAt).format('LLL'),
                         inline: true
                     },
 
                     {
                         //displays the current roles of the mentioned user
                         name: 'Roles:',
-                        value: UserGuildID.roles.cache.filter(r => r.name !== '@everyone').map(role => role.name).join(` **|** `),
+                        value: user_GuildId.roles.cache.filter(r => r.name !== '@everyone').map(role => role.name).join(` **|** `),
                         inline: true
                     },
 
@@ -245,11 +247,11 @@ function Interaction() {
                     {
                         //total time the user has been a member in the server
                         name: 'Membership Length',
-                        value: `Member for **${jointime.totaltimeyear}** years **${jointime.adjustedmonths}** months **${jointime.adjusteddays}** days **${jointime.adjustedhours}** hours`
+                        value: `Member for **${user_Age.TotalYears}** years **${user_Age.GuildMonths}** months **${user_Age.GuildDays}** days **${user_Age.GuildHours}** hours`
                     }
 
                 )
-                .setFooter('Eastern State Florida Cyber Team', BotUserId.displayAvatarURL({dynamic: true}));    //displays bots avatar
+                .setFooter('Eastern State Florida Cyber Team', client_Id.displayAvatarURL({dynamic: true}));    //displays bots avatar
 
             //calls to print embed
             interaction.reply({embeds: [MemberInfo]});
@@ -260,19 +262,18 @@ function Interaction() {
         if (commandName === 'newmemberroles'){
 
             //data which will need to add in a file.
-            let RoleInfo = interaction.options.getRole('role');
-            console.log(RoleInfo);
+            let role_Info = interaction.options.getRole('role');
 
             //formats data
-            let roleid = `{\n"roleID": "${RoleInfo.id}"\n}`
+            let role_Id = `{\n"roleId": "${role_Info.id}"\n}`
 
             //write data in 'roleconfig.json'.
-            fsLibrary.writeFile('roleconfig.json', roleid, (error) => {
+            fsLibrary.writeFile('roleconfig.json', role_Id, (error) => {
 
             })
 
             //informs the user
-            interaction.reply(`New Member Role changed to **${RoleInfo.name}**`);
+            interaction.reply(`New Member Role changed to **${role_Info.name}**`);
 
         }
 
@@ -280,24 +281,23 @@ function Interaction() {
         if (commandName === 'welcomechannel'){
 
             //data which will need to add in a file.
-            let ChannelInfo = interaction.options.getChannel('channel');
-            console.log(ChannelInfo.type);
+            let channel_Info = interaction.options.getChannel('channel');
 
             //Makes sure its actually a channel
-            if(ChannelInfo.type === "GUILD_TEXT"){
+            if(channel_Info.type === "GUILD_TEXT"){
 
                 //formats data
-                let channelID = `{\n"channelID": "${ChannelInfo.id}"\n}`
+                let channel_Id = `{\n"channelID": "${channel_Info.id}"\n}`
 
                 //write data in 'channelconfig.json'.
-                fsLibrary.writeFile('channelconfig.json', channelID, (error) => {
+                fsLibrary.writeFile('channelconfig.json', channel_Id, (error) => {
 
                 })
 
-                let WelcomeMessage = new MessageEmbed()
+                let WelcomeMessage_Embed = new MessageEmbed()
                     .setTitle(':warning: __**EFSC Discord Rules**__ :warning:')
-                    .setAuthor("EFSC Bot", BotUserId.displayAvatarURL({dynamic: true})) //Displays avatar of the bot
-                    .setThumbnail(BotUserId.displayAvatarURL())    //Displays avatar of mentioned user
+                    .setAuthor("EFSC Bot", client_Id.displayAvatarURL({dynamic: true})) //Displays avatar of the bot
+                    .setThumbnail(client_Id.displayAvatarURL())    //Displays avatar of mentioned user
                     .setDescription("Rules for Tech Club Discord\n" +
                         "**1**. Do not violate the EFSC Code of Conduct.\n" +
                         "**2**. __DO NOT POST NSFW CONTENT!__\n" +
@@ -308,18 +308,18 @@ function Interaction() {
                         "**Please react with :thumbsup: to confirm you have read and understand the rules**")
                     .setTimestamp()
                     .setColor('#007940')    //color of trim EFSC official color
-                    .setFooter('Eastern State Florida Cyber Team', BotUserId.displayAvatarURL({dynamic: true}));    //displays bots avatar
+                    .setFooter('Eastern State Florida Cyber Team', client_Id.displayAvatarURL({dynamic: true}));    //displays bots avatar
 
                 //sends the embed to the channel
-                const message = await client.channels.cache.get(ChannelInfo.id).send({embeds: [WelcomeMessage]});
-                message.react('👍');
+                const welcomemessage = await client.channels.cache.get(channel_Info.id).send({embeds: [WelcomeMessage_Embed]});
+                welcomemessage.react('👍');
 
                 //finds the message id of sent message
-                let id = message.id;
-                console.log(id);
+                let welcomemessage_Id = welcomemessage.id;
+                console.log(welcomemessage_Id);
 
                 //informs the user of the channel it was created in.
-                interaction.reply(`Welcome message created in channel <#${ChannelInfo.id}>`);
+                interaction.reply(`Welcome message created in channel <#${channel_Info.id}>`);
 
             }
 
