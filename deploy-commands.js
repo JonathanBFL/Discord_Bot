@@ -21,6 +21,14 @@ const commands = [
             .setDescription('The role')),   //give description
 
     new SlashCommandBuilder()
+        .setName('adminmemberrole')
+        .setDescription('Sets the role that can use the bot')
+        .addRoleOption(option => option
+            .setRequired(true)  //requires mention input
+            .setName('role')  //mentioned user var
+            .setDescription('The role')),   //give description
+
+    new SlashCommandBuilder()
         .setName('userinfo')    //names the command
         .setDescription('Get the information of a member.')
         .addUserOption(option => option
