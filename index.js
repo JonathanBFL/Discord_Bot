@@ -169,7 +169,7 @@ function calcDate(UserGuildID) {
 function Interaction() {
 
     //listens for interactions (slash commands)
-    client.on('interactionCreate', interaction => {
+    client.on('interactionCreate', async interaction => {
 
         //returns if no command
         if (!interaction.isCommand()) return;
@@ -247,6 +247,7 @@ function Interaction() {
                         name: 'Membership Length',
                         value: `Member for **${jointime.totaltimeyear}** years **${jointime.adjustedmonths}** months **${jointime.adjusteddays}** days **${jointime.adjustedhours}** hours`
                     }
+
                 )
                 .setFooter('Eastern State Florida Cyber Team', BotUserId.displayAvatarURL({dynamic: true}));    //displays bots avatar
 
@@ -270,6 +271,9 @@ function Interaction() {
 
             })
 
+            //informs the user
+            interaction.reply(`New Member Role changed to **${RoleInfo.name}**`);
+
         }
 
         //looks for welcome channel commands todo: create the welcome message when selected
@@ -277,16 +281,58 @@ function Interaction() {
 
             //data which will need to add in a file.
             let ChannelInfo = interaction.options.getChannel('channel');
-            console.log(ChannelInfo);
+            console.log(ChannelInfo.type);
 
-            //formats data
-            let channelID = `{\n"channelID": "${ChannelInfo.id}"\n}`
+            //Makes sure its actually a channel
+            if(ChannelInfo.type === "GUILD_TEXT"){
 
-            //write data in 'channelconfig.json'.
-            fsLibrary.writeFile('channelconfig.json', channelID, (error) => {
+                //formats data
+                let channelID = `{\n"channelID": "${ChannelInfo.id}"\n}`
 
-            })
+                //write data in 'channelconfig.json'.
+                fsLibrary.writeFile('channelconfig.json', channelID, (error) => {
 
+                })
+
+                let WelcomeMessage = new MessageEmbed()
+                    .setTitle(':warning: __**EFSC Discord Rules**__ :warning:')
+                    .setAuthor("EFSC Bot", BotUserId.displayAvatarURL({dynamic: true})) //Displays avatar of the bot
+                    .setThumbnail(BotUserId.displayAvatarURL())    //Displays avatar of mentioned user
+                    .setDescription("Rules for Tech Club Discord\n" +
+                        "**1**. Do not violate the EFSC Code of Conduct.\n" +
+                        "**2**. __DO NOT POST NSFW CONTENT!__\n" +
+                        "**3**. Do not spam chat.\n" +
+                        "**4**. Treat everyone with respect.\n" +
+                        "**5**. Racism and sexism will not be tolerated.\n" +
+                        "**6**. Avoid political discussions.\n\n" +
+                        "**Please react with :thumbsup: to confirm you have read and understand the rules**")
+                    .setTimestamp()
+                    .setColor('#007940')    //color of trim EFSC official color
+                    .setFooter('Eastern State Florida Cyber Team', BotUserId.displayAvatarURL({dynamic: true}));    //displays bots avatar
+
+                //sends the embed to the channel
+                const message = await client.channels.cache.get(ChannelInfo.id).send({embeds: [WelcomeMessage]});
+                message.react('👍');
+
+                //finds the message id of sent message
+                let id = message.id;
+                console.log(id);
+
+                //informs the user of the channel it was created in.
+                interaction.reply(`Welcome message created in channel <#${ChannelInfo.id}>`);
+
+            }
+
+            //Informs user wrong channel was selected
+            else{
+
+                interaction.reply("Invalid - Please select a real channel!");
+
+            }
+
+            /*
+            todo: add reactionrole function for created message
+            */
         }
 
     });
