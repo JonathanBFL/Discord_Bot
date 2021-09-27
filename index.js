@@ -35,7 +35,7 @@ client.once('ready', () => {
     setTimeout(() => {
 
         //prints in console the bot is ready.
-        console.log(`\nLogged in as ${client.user.tag}.`);
+        console.log(`\n${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}\nLogged in as ${client.user.tag}.`);
 
         console.log(`Monitoring ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} servers.`);
 
@@ -56,20 +56,13 @@ function CheckRoleLoop() {
 
     //call function
     loop();
+    fetchloop();
 
-
-//todo: seperate loops based on need
     //Loops commands
     function loop() {
 
         //Calls for an uncached retrieval of roleID
         const {roleId} = requireUncached('./roleconfig.json');
-
-        //fetches the complete cache - needed to grab users that are offline/havent spoken in 10min/ etc
-        client.guilds.cache.get(guildId).members.fetch();
-
-        //fetches the complete cache - needed to grab users that are offline/havent spoken in 10min/ etc
-        client.guilds.cache.get(guildId).roles.fetch();
 
         //Get guilds cache
         const guild_Id = client.guilds.cache.get(guildId);
@@ -84,50 +77,73 @@ function CheckRoleLoop() {
         let role_map = guild_Id.members.cache.filter(member => member.roles.cache.find(role => role.id === roleId));
 
         //prints to console how many members have the role and a list of the members
-        console.log(`${role_map.size} users with role (${role_Id.name}):\n${RoleMembers_map}\n`);
+        console.log(`${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}\n${role_map.size} users with role (${role_Id.name}):\n${RoleMembers_map}\n`);
 
-        //defines the iterator
-        const iterator1 = role_map.keys();
+        //sets interval to 60 seconds
+        setTimeout(loop, 60 * 1000);
 
-        //for loop the size of the map
-        for (let i = 0; i < role_map.size; i++) {
+    }
 
-            //User ID - iterates through the map
-            let user_Id = iterator1.next().value;
+}
 
-            //Get Guild ID of User ID
-            let User_GuildId = guild_Id.members.cache.get(user_Id);
+//loops fetch cache and 60 day role removal - slower than loop() for performance
+function fetchloop() {
 
-            //checks if user is older than 60 days by calling calcdate()
-            if (calcDate(User_GuildId).GuildDays > 60) {
+    //fetches the complete cache - needed to grab users that are offline/havent spoken in 10min/ etc
+    client.guilds.cache.get(guildId).members.fetch();
 
-                //adds roleID variable
-                let User_RoleId = User_GuildId.guild.roles.cache.get(roleId);
+    //fetches the complete cache - needed to grab users that are offline/havent spoken in 10min/ etc
+    client.guilds.cache.get(guildId).roles.fetch();
 
-                //if user has role run
-                if (User_GuildId.roles.cache.has(roleId)) {
+    //Calls for an uncached retrieval of roleID
+    const {roleId} = requireUncached('./roleconfig.json');
 
-                    //adds role
-                    User_GuildId.roles.remove(roleId);
+    //Get guilds cache
+    const guild_Id = client.guilds.cache.get(guildId);
 
-                    //prints to console
-                    console.log(`${User_GuildId.displayName} was removed from role: ${User_RoleId.name}`);
+    //Creates map of members with role
+    let role_map = guild_Id.members.cache.filter(member => member.roles.cache.find(role => role.id === roleId));
 
-                }
+    //defines the iterator
+    const iterator1 = role_map.keys();
 
-                //if user does not have role
-                else {
+    //for loop the size of the map
+    for (let i = 0; i < role_map.size; i++) {
 
-                }
+        //User ID - iterates through the map
+        let user_Id = iterator1.next().value;
+
+        //Get Guild ID of User ID
+        let User_GuildId = guild_Id.members.cache.get(user_Id);
+
+        //checks if user is older than 60 days by calling calcdate()
+        if (calcDate(User_GuildId).GuildDays > 60) {
+
+            //adds roleID variable
+            let User_RoleId = User_GuildId.guild.roles.cache.get(roleId);
+
+            //if user has role run
+            if (User_GuildId.roles.cache.has(roleId)) {
+
+                //adds role
+                User_GuildId.roles.remove(roleId);
+
+                //prints to console
+                console.log(`${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}\n${User_GuildId.displayName} was removed from role: ${User_RoleId.name}\n`);
+
+            }
+
+            //if user does not have role
+            else {
 
             }
 
         }
 
-        //sets interval to 30 seconds todo: slow down for performance
-        setTimeout(loop, 3 * 1000);
-
     }
+
+    //sets interval to 10 minutes
+    setTimeout(fetchloop, 10 * 60 * 1000);
 
 }
 
@@ -340,6 +356,7 @@ function Interaction() {
 
         }
 
+        //todo: prevent changing to same role as bot
         //looks for new member role command
         if (commandName === 'newmemberroles') {
 
