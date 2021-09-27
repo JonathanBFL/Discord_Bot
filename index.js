@@ -57,11 +57,19 @@ function CheckRoleLoop() {
     //call function
     loop();
 
+
+//todo: seperate loops based on need
     //Loops commands
     function loop() {
 
         //Calls for an uncached retrieval of roleID
         const {roleId} = requireUncached('./roleconfig.json');
+
+        //fetches the complete cache - needed to grab users that are offline/havent spoken in 10min/ etc
+        client.guilds.cache.get(guildId).members.fetch();
+
+        //fetches the complete cache - needed to grab users that are offline/havent spoken in 10min/ etc
+        client.guilds.cache.get(guildId).roles.fetch();
 
         //Get guilds cache
         const guild_Id = client.guilds.cache.get(guildId);
