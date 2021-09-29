@@ -107,6 +107,9 @@ function fetchloop() {
     //defines the iterator
     const iterator1 = role_map.keys();
 
+    //set bot Activity
+    client.user.setActivity("testing");
+
     //for loop the size of the map
     for (let i = 0; i < role_map.size; i++) {
 
@@ -226,12 +229,27 @@ function Interaction() {
             //grabs role
             let role_Id = guild_Id.roles.cache.get(roleId);
 
+            let user_Id = interaction.member.id;
+
+            let User_GuildId = guild_Id.members.cache.get(user_Id);
+
             //print they reacted
-            if (interaction.member.roles.cache.has(role_Id.id)) {
+            if (interaction.member.roles.cache.has(role_Id.id) || calcDate(User_GuildId).GuildDays > 60) {
 
-                //prints confirmation
+                //finds if user is 60+ days old
+                if (calcDate(User_GuildId).GuildDays > 60){
 
-                interaction.reply(`Don't be silly, you already read the rules <@${interaction.user.id}>!`);
+                    interaction.reply(`Don't be silly, you should know the rules by now <@${interaction.user.id}>!`);
+
+                }
+
+                //if member has new member role
+                else{
+
+                    //prints confirmation
+                    interaction.reply(`Don't be silly, you already read the rules <@${interaction.user.id}>!`);
+
+                }
 
                 //Deletes message after 10 seconds
                 setTimeout(function () {
@@ -241,6 +259,7 @@ function Interaction() {
                 }, 10 * 1000);
 
             }
+
 
             //print they already reacted
             else {
