@@ -1,5 +1,5 @@
 // Require the necessary discord.js classes
-const {Client, Intents, MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const {Client, Intents, MessageEmbed, MessageActionRow, MessageButton, Permissions} = require('discord.js');
 const {token, guildId, clientId} = require('./config.json');
 
 //import moment module
@@ -23,9 +23,10 @@ const client = new Client({
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
 
-    //fetches the complete cache - useful for getting data when bot was offline
+    //fetches the complete guild members cache - useful for getting data when bot was offline
     client.guilds.cache.get(guildId).members.fetch();
 
+    //fetches the complete guild roles cache - useful for getting data when bot was offline
     client.guilds.cache.get(guildId).roles.fetch();
 
     //set bot Activity
@@ -34,16 +35,19 @@ client.once('ready', () => {
     //set a 1 second delay before functions are called - gives time to fetch caches
     setTimeout(() => {
 
-        //prints in console the bot is ready.
+        //Prints time the client connected
         console.log(`\n${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}\nLogged in as ${client.user.tag}.`);
 
+        //Prints how many users/channels/servers the bot is monitoring
         console.log(`Monitoring ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} servers.`);
 
+        //prints in console the bot is ready.
         console.log(`${client.user.username} is ready to spy!\n`);
 
-        //calls functions
+        //calls function
         Interaction();
 
+        //call function
         CheckRoleLoop();
 
         //1 second delay
@@ -56,6 +60,8 @@ function CheckRoleLoop() {
 
     //call function
     loop();
+
+    //call function
     fetchloop();
 
     //Loops commands
@@ -76,6 +82,7 @@ function CheckRoleLoop() {
         //Creates map of members with role
         let role_map = guild_Id.members.cache.filter(member => member.roles.cache.find(role => role.id === roleId));
 
+        //todo: add more info - online users - etc.
         //prints to console how many members have the role and a list of the members
         console.log(`${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}\n${role_map.size} users with role (${role_Id.name}):\n${RoleMembers_map}\n`);
 
@@ -229,8 +236,10 @@ function Interaction() {
             //grabs role
             let role_Id = guild_Id.roles.cache.get(roleId);
 
+            //grabs user id
             let user_Id = interaction.member.id;
 
+            //grabs guild user info
             let User_GuildId = guild_Id.members.cache.get(user_Id);
 
             //print they reacted
@@ -239,6 +248,7 @@ function Interaction() {
                 //finds if user is 60+ days old
                 if (calcDate(User_GuildId).GuildDays > 60){
 
+                    //prints confirmation
                     interaction.reply(`Don't be silly, you should know the rules by now <@${interaction.user.id}>!`);
 
                 }
@@ -259,7 +269,6 @@ function Interaction() {
                 }, 10 * 1000);
 
             }
-
 
             //print they already reacted
             else {
@@ -375,7 +384,6 @@ function Interaction() {
 
         }
 
-        //todo: prevent changing to same role as bot
         //looks for new member role command
         if (commandName === 'newmemberroles') {
 
@@ -393,19 +401,33 @@ function Interaction() {
                 //data which will need to add in a file.
                 let role_Info = interaction.options.getRole('role');
 
-                //formats data
-                let role_Id = `{\n"roleId": "${role_Info.id}"\n}`;
+                //If the "new member" role has admin privileges, rejects it
+                if (role_Info.permissions.has(Permissions.FLAGS.ADMINISTRATOR), true){
 
-                //write data in 'roleconfig.json'.
-                fsLibrary.writeFile('roleconfig.json', role_Id, (error) => {
+                    //informs user
+                    interaction.reply(`That role has Administrative privileges **<@${interaction.member.id}>**`);
 
-                })
+                }
 
-                //informs the user
-                interaction.reply(`New Member Role changed to **${role_Info.name}**`);
+                //if the new member role _does not_ have admin privileges, write it.
+                else {
+
+                    //formats data
+                    let role_Id = `{\n"roleId": "${role_Info.id}"\n}`;
+
+                    //write data in 'roleconfig.json'.
+                    fsLibrary.writeFile('roleconfig.json', role_Id, (error) => {
+
+                    })
+
+                    //informs the user
+                    interaction.reply(`New Member Role changed to **${role_Info.name}**`);
+
+                }
 
             }
 
+            //if not admin or bot command role - informs user they cant use this command
             else {
 
                 //lets user know they dont have permissions to run command
@@ -445,6 +467,7 @@ function Interaction() {
 
             }
 
+            //if not admin or bot command role - informs user they cant use this command
             else {
 
                 //lets user know they dont have permissions to run command
