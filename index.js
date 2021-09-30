@@ -70,21 +70,61 @@ function CheckRoleLoop() {
         //Calls for an uncached retrieval of roleID
         const {roleId} = requireUncached('./roleconfig.json');
 
+        //Calls for an uncached retrieval of BotControlrole_Id
+        const {adminroleId} = requireUncached('./adminroleconfig.json');
+
         //Get guilds cache
         const guild_Id = client.guilds.cache.get(guildId);
 
         //grabs role
         let role_Id = guild_Id.roles.cache.get(roleId);
 
-        //finds each member with role "test"
-        let RoleMembers_map = guild_Id.members.cache.filter(member => member.roles.cache.find(role => role.id === roleId)).map(member => member.displayName).join(` | `);
+        //grabs role
+        let BotControlrole_Id = guild_Id.roles.cache.get(adminroleId);
 
         //Creates map of members with role
         let role_map = guild_Id.members.cache.filter(member => member.roles.cache.find(role => role.id === roleId));
 
+        //joins the map
+        let RoleMembers_map = role_map.map(member => member.displayName).join(` | `);
+
+        //finds each member with bot control role
+        let BotControl_map = guild_Id.members.cache.filter(member => member.roles.cache.find(role => role === BotControlrole_Id))
+
+        //joins the map
+        let BotControlMembers = BotControl_map.map(member => member.displayName).join(` | `);
+
         //todo: add more info - online users - etc.
+
+        //box formatting
+        console.log(`────────────────────────────────────┐`);
+
         //prints to console how many members have the role and a list of the members
-        console.log(`${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}\n${role_map.size} users with role (${role_Id.name}):\n${RoleMembers_map}\n`);
+        console.log(`${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}    │`);
+
+        //box formatting
+        console.log(`────────────────────────────────────┴─────────────────────┐`);
+
+        //Prints how many users/channels/servers the bot is monitoring
+        console.log(`Monitoring ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} servers.`);
+
+        //prints how many user the guild has
+        console.log(`${guild_Id.name} has a total of ${guild_Id.members.cache.size} users.`);
+
+        //box formatting
+        console.log(`──────────────────────────────────────────────────────────┤`)
+
+        //Prints who can control the bot
+        console.log(`${BotControl_map.size} members can control the bot with role @${BotControlrole_Id.name}:\n${BotControlMembers}`);
+
+        //box formatting
+        console.log(`──────────────────────────────────────────────────────────┤`)
+
+        //Prints how many users are in the guild
+        console.log(`${role_map.size} new members with role @${role_Id.name}:\n${RoleMembers_map}`);
+
+        //box formatting
+        console.log(`──────────────────────────────────────────────────────────┘\n`)
 
         //sets interval to 60 seconds
         setTimeout(loop, 60 * 1000);
@@ -96,10 +136,10 @@ function CheckRoleLoop() {
 //loops fetch cache and 60 day role removal - slower than loop() for performance
 function fetchloop() {
 
-    //fetches the complete cache - needed to grab users that are offline/havent spoken in 10min/ etc
+    //fetches the complete cache - needed to grab users that are offline/haven't spoken in 10min/ etc
     client.guilds.cache.get(guildId).members.fetch();
 
-    //fetches the complete cache - needed to grab users that are offline/havent spoken in 10min/ etc
+    //fetches the complete cache - needed to grab users that are offline/haven't spoken in 10min/ etc
     client.guilds.cache.get(guildId).roles.fetch();
 
     //Calls for an uncached retrieval of roleID
@@ -402,7 +442,7 @@ function Interaction() {
                 let role_Info = interaction.options.getRole('role');
 
                 //If the "new member" role has admin privileges, rejects it
-                if (role_Info.permissions.has(Permissions.FLAGS.ADMINISTRATOR), true){
+                if (role_Info.permissions.has(Permissions.FLAGS.ADMINISTRATOR) === true){
 
                     //informs user
                     interaction.reply(`That role has Administrative privileges **<@${interaction.member.id}>**`);
@@ -537,7 +577,6 @@ function Interaction() {
                         components: [button]
                     });
 
-
                     //informs the user of the channel it was created in.
                     interaction.reply(`Welcome message created in channel <#${channel_Info.id}>`);
 
@@ -562,6 +601,7 @@ function Interaction() {
                     interaction.reply(`You do not have permissions to use that command **<@${interaction.member.id}>**.`);
 
                 }
+
             }
 
         }
