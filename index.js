@@ -30,7 +30,7 @@ client.once('ready', () => {
     client.guilds.cache.get(guildId).roles.fetch();
 
     //set bot Activity
-    client.user.setActivity("testing");
+    client.user.setActivity("V1.1 Release!");
 
     //set a 1 second delay before functions are called - gives time to fetch caches
     setTimeout(() => {
@@ -55,6 +55,14 @@ client.once('ready', () => {
 
 });
 
+//todo: add role for members who havnt read rules
+//todo: clean up
+client.on('guildMemberAdd', (guildMember) => {
+    console.log('User: ' + guildMember.user.username + ' has joined the server!');
+    guildMember.roles.add("892955472305487893");
+
+});
+
 //checks for users role - contains loop to refresh cache
 function CheckRoleLoop() {
 
@@ -67,32 +75,8 @@ function CheckRoleLoop() {
     //Loops commands
     function loop() {
 
-        //Calls for an uncached retrieval of roleID
-        const {roleId} = requireUncached('./roleconfig.json');
-
-        //Calls for an uncached retrieval of BotControlrole_Id
-        const {adminroleId} = requireUncached('./adminroleconfig.json');
-
         //Get guilds cache
         const guild_Id = client.guilds.cache.get(guildId);
-
-        //grabs role
-        let role_Id = guild_Id.roles.cache.get(roleId);
-
-        //grabs role
-        let BotControlrole_Id = guild_Id.roles.cache.get(adminroleId);
-
-        //Creates map of members with role
-        let role_map = guild_Id.members.cache.filter(member => member.roles.cache.find(role => role.id === roleId));
-
-        //joins the map
-        let RoleMembers_map = role_map.map(member => member.displayName).join(` | `);
-
-        //finds each member with bot control role
-        let BotControl_map = guild_Id.members.cache.filter(member => member.roles.cache.find(role => role === BotControlrole_Id))
-
-        //joins the map
-        let BotControlMembers = BotControl_map.map(member => member.displayName).join(` | `);
 
         //todo: add more info - online users - etc.
 
@@ -100,7 +84,7 @@ function CheckRoleLoop() {
         console.log(`────────────────────────────────────┐`);
 
         //prints to console how many members have the role and a list of the members
-        console.log(`${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}    │`);
+        console.log(`${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}`);
 
         //box formatting
         console.log(`────────────────────────────────────┴─────────────────────┐`);
@@ -110,18 +94,6 @@ function CheckRoleLoop() {
 
         //prints how many user the guild has
         console.log(`${guild_Id.name} has a total of ${guild_Id.members.cache.size} users.`);
-
-        //box formatting
-        console.log(`──────────────────────────────────────────────────────────┤`)
-
-        //Prints who can control the bot
-        console.log(`${BotControl_map.size} members can control the bot with role @${BotControlrole_Id.name}:\n${BotControlMembers}`);
-
-        //box formatting
-        console.log(`──────────────────────────────────────────────────────────┤`)
-
-        //Prints how many users are in the guild
-        console.log(`${role_map.size} new members with role @${role_Id.name}:\n${RoleMembers_map}`);
 
         //box formatting
         console.log(`──────────────────────────────────────────────────────────┘\n`)
@@ -155,7 +127,7 @@ function fetchloop() {
     const iterator1 = role_map.keys();
 
     //set bot Activity
-    client.user.setActivity("testing");
+    client.user.setActivity("V1.1 Released!");
 
     //for loop the size of the map
     for (let i = 0; i < role_map.size; i++) {
@@ -167,7 +139,7 @@ function fetchloop() {
         let User_GuildId = guild_Id.members.cache.get(user_Id);
 
         //checks if user is older than 60 days by calling calcdate()
-        if (calcDate(User_GuildId).GuildDays > 60) {
+        if (calcDate(User_GuildId).TotalMonths > 2) {
 
             //adds roleID variable
             let User_RoleId = User_GuildId.guild.roles.cache.get(roleId);
@@ -283,13 +255,13 @@ function Interaction() {
             let User_GuildId = guild_Id.members.cache.get(user_Id);
 
             //print they reacted
-            if (interaction.member.roles.cache.has(role_Id.id) || calcDate(User_GuildId).GuildDays > 60) {
+            if (interaction.member.roles.cache.has(role_Id.id) || calcDate(User_GuildId).TotalMonths > 2) {
 
                 //finds if user is 60+ days old
-                if (calcDate(User_GuildId).GuildDays > 60){
+                if (calcDate(User_GuildId).TotalMonths > 2){
 
                     //prints confirmation
-                    interaction.reply(`Don't be silly, you should know the rules by now <@${interaction.user.id}>!`);
+                    interaction.reply(`You've been here for over two months, you should know the rules by now <@${interaction.user.id}>!`);
 
                 }
 
@@ -312,6 +284,10 @@ function Interaction() {
 
             //print they already reacted
             else {
+
+                //todo: cleanup
+                //Adds role defined by newmember function
+                interaction.member.roles.remove('892955472305487893');
 
                 //Adds role defined by newmember function
                 interaction.member.roles.add(role_Id);
@@ -436,7 +412,7 @@ function Interaction() {
             let role_Id = guild_Id.roles.cache.get(adminroleId);
 
             //Requires designated role or admins to run command
-            if (interaction.member.roles.cache.has(role_Id.id) || interaction.member.permissions.has('Administrator')) {
+            if (interaction.member.permissions.has('Administrator') || interaction.member.roles.cache.has(role_Id.id)) {
 
                 //data which will need to add in a file.
                 let role_Info = interaction.options.getRole('role');
@@ -489,7 +465,7 @@ function Interaction() {
             let role_Id = guild_Id.roles.cache.get(adminroleId);
 
             //Requires designated role or admins to run command
-            if (interaction.member.roles.cache.has(role_Id.id) || interaction.member.permissions.has('Administrator')) {
+            if (interaction.member.permissions.has('Administrator') || interaction.member.roles.cache.has(role_Id.id)) {
 
                 //data which will need to add in a file.
                 let role_Info = interaction.options.getRole('role');
@@ -529,7 +505,7 @@ function Interaction() {
             let role_Id = guild_Id.roles.cache.get(adminroleId);
 
             //Requires designated role or admins to run command
-            if (interaction.member.roles.cache.has(role_Id.id) || interaction.member.permissions.has('Administrator')) {
+            if (interaction.member.permissions.has('Administrator') || interaction.member.roles.cache.has(role_Id.id)) {
 
                 //data which will need to add in a file.
                 let channel_Info = interaction.options.getChannel('channel');
