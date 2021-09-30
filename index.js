@@ -78,10 +78,18 @@ function CheckRoleLoop() {
         //Get guilds cache
         const guild_Id = client.guilds.cache.get(guildId);
 
-        //todo: add more info - online users - etc.
+        //todo: add more info - online users - etc. uptime
+
+        //EFSC ascii
+        console.log(`┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓`);
+        console.log(`┃    _________________ ______┃`);
+        console.log(`┃   / ____/ ____/ ___// ____/┃`);
+        console.log(`┃  / __/ / /_   \\__ \\/ /     ┃`);
+        console.log(`┃ / /___/ __/  ___/ / /___   ┃`);
+        console.log(`┃/_____/_/    /____/\\____/   ┃`);
 
         //box formatting
-        console.log(`────────────────────────────────────┐`);
+        console.log(`┖────────────────────────────┸──────┐`);
 
         //prints to console how many members have the role and a list of the members
         console.log(`${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}`);
