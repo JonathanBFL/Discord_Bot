@@ -30,7 +30,7 @@ client.once('ready', () => {
     client.guilds.cache.get(guildId).roles.fetch();
 
     //set bot Activity
-    client.user.setActivity("testing");
+    client.user.setActivity("V1.1 Release!");
 
     //set a 1 second delay before functions are called - gives time to fetch caches
     setTimeout(() => {
@@ -67,32 +67,8 @@ function CheckRoleLoop() {
     //Loops commands
     function loop() {
 
-        //Calls for an uncached retrieval of roleID
-        const {roleId} = requireUncached('./roleconfig.json');
-
-        //Calls for an uncached retrieval of BotControlrole_Id
-        const {adminroleId} = requireUncached('./adminroleconfig.json');
-
         //Get guilds cache
         const guild_Id = client.guilds.cache.get(guildId);
-
-        //grabs role
-        let role_Id = guild_Id.roles.cache.get(roleId);
-
-        //grabs role
-        let BotControlrole_Id = guild_Id.roles.cache.get(adminroleId);
-
-        //Creates map of members with role
-        let role_map = guild_Id.members.cache.filter(member => member.roles.cache.find(role => role.id === roleId));
-
-        //joins the map
-        let RoleMembers_map = role_map.map(member => member.displayName).join(` | `);
-
-        //finds each member with bot control role
-        let BotControl_map = guild_Id.members.cache.filter(member => member.roles.cache.find(role => role === BotControlrole_Id))
-
-        //joins the map
-        let BotControlMembers = BotControl_map.map(member => member.displayName).join(` | `);
 
         //todo: add more info - online users - etc.
 
@@ -110,18 +86,6 @@ function CheckRoleLoop() {
 
         //prints how many user the guild has
         console.log(`${guild_Id.name} has a total of ${guild_Id.members.cache.size} users.`);
-
-        //box formatting
-        console.log(`──────────────────────────────────────────────────────────┤`)
-
-        //Prints who can control the bot
-        console.log(`${BotControl_map.size} members can control the bot with role @${BotControlrole_Id.name}:\n${BotControlMembers}`);
-
-        //box formatting
-        console.log(`──────────────────────────────────────────────────────────┤`)
-
-        //Prints how many users are in the guild
-        console.log(`${role_map.size} new members with role @${role_Id.name}:\n${RoleMembers_map}`);
 
         //box formatting
         console.log(`──────────────────────────────────────────────────────────┘\n`)
@@ -436,7 +400,7 @@ function Interaction() {
             let role_Id = guild_Id.roles.cache.get(adminroleId);
 
             //Requires designated role or admins to run command
-            if (interaction.member.roles.cache.has(role_Id.id) || interaction.member.permissions.has('Administrator')) {
+            if (interaction.member.permissions.has('Administrator') || interaction.member.roles.cache.has(role_Id.id)) {
 
                 //data which will need to add in a file.
                 let role_Info = interaction.options.getRole('role');
@@ -489,7 +453,7 @@ function Interaction() {
             let role_Id = guild_Id.roles.cache.get(adminroleId);
 
             //Requires designated role or admins to run command
-            if (interaction.member.roles.cache.has(role_Id.id) || interaction.member.permissions.has('Administrator')) {
+            if (interaction.member.permissions.has('Administrator') || interaction.member.roles.cache.has(role_Id.id)) {
 
                 //data which will need to add in a file.
                 let role_Info = interaction.options.getRole('role');
