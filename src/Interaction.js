@@ -1,252 +1,12 @@
-// Require the necessary discord.js classes
-const {Client, Intents} = require('discord.js');
-const {token, guildId} = require('./src/config.json');
-const Interaction = require("./src/Interaction")
-const CheckRoleLoop = require("./src/CheckRoleLoop")
-
-//import moment module
-const moment = require("moment");
-
-// Create a new client instance
-const client = new Client({
-    intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MEMBERS,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-        Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-        Intents.FLAGS.DIRECT_MESSAGES
-    ],
-
-});
-
-// When the client is ready, run this code (only once)
-client.once('ready', () => {
-
-    //fetches the complete guild members cache - useful for getting data when bot was offline
-    client.guilds.cache.get(guildId).members.fetch();
-
-    //fetches the complete guild roles cache - useful for getting data when bot was offline
-    client.guilds.cache.get(guildId).roles.fetch();
-
-    //set bot Activity
-    client.user.setActivity("V1.1 Release!");
-
-    //set a 1 second delay before functions are called - gives time to fetch caches
-    setTimeout(() => {
-
-        //Prints time the client connected
-        console.log(`\n${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}\nLogged in as ${client.user.tag}.`);
-
-        //Prints how many users/channels/servers the bot is monitoring
-        console.log(`Monitoring ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} servers.`);
-
-        //prints in console the bot is ready.
-        console.log(`${client.user.username} is ready to spy!\n`);
-
-        //calls function
-        Interaction.Interaction(client);
-
-        //call function
-        CheckRoleLoop.CheckRoleLoop(client);
-
-        //1 second delay
-    }, 1 * 1000)
-
-});
-
-//todo: add role for members who havnt read rules
-//todo: clean up
-client.on('guildMemberAdd', (guildMember) => {
-    console.log('User: ' + guildMember.user.username + ' has joined the server!');
-    guildMember.roles.add("892955472305487893");
-
-});
-/*
-//checks for users role - contains loop to refresh cache
-function CheckRoleLoop() {
-
-    //call function
-    loop();
-
-    //call function
-    fetchloop.fetchloop(client);
-
-    //Loops commands
-    function loop() {
-
-        //Get guilds cache
-        const guild_Id = client.guilds.cache.get(guildId);
-
-        //todo: add more info - online users - etc. uptime
-
-        //EFSC ascii
-        console.log(`\t  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓`);
-        console.log(`\t  ┃      _________________ ______  ┃`);
-        console.log(`\t  ┃     / ____/ ____/ ___// ____/  ┃`);
-        console.log(`\t  ┃    / __/ / /_   \\__ \\/ /       ┃`);
-        console.log(`\t  ┃   / /___/ __/  ___/ / /___     ┃`);
-        console.log(`\t  ┃  /_____/_/    /____/\\____/     ┃`);
-        console.log(`\t  ┃          Cyber Titans          ┃`);
-
-        //box formatting
-        console.log(`┌─────────┺━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┹────────────┐`);
-
-        //prints to console how many members have the role and a list of the members
-        console.log(`│\t      ${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}\t\t│`);
-
-        //box formatting
-        console.log(`├───────────────────────────────────────────────────────┤`);
-
-        //prints how many user the guild has
-        console.log(`│ ${guild_Id.name} has a total of ${guild_Id.members.cache.size} users.\t│`);
-
-        //Prints how many channels the bot is monitoring
-        console.log(`│ Monitoring ${guild_Id.channels.cache.size} channels.\t\t\t\t│`);
-
-        //box formatting
-        console.log(`└───────────────────────────────────────────────────────┘`)
-
-
-        let RoleMembers_map = guild_Id.roles.cache.find(r => r.id === '889284732167290880').members.map(member => member.displayName).join(` | `);
-
-
-        console.log(`Users in server:\n${RoleMembers_map}\n`);
-
-
-
-        //sets interval to 60 seconds
-        setTimeout(loop, 60 * 1000);
-
-    }
-
-}
-
-//loops fetch cache and 60 day role removal - slower than loop() for performance
-function fetchloop() {
-
-    //fetches the complete cache - needed to grab users that are offline/haven't spoken in 10min/ etc
-    client.guilds.cache.get(guildId).members.fetch();
-
-    //fetches the complete cache - needed to grab users that are offline/haven't spoken in 10min/ etc
-    client.guilds.cache.get(guildId).roles.fetch();
-
-    //Calls for an uncached retrieval of roleID
-    const {roleId} = requireUncached.requireUncached('./roleconfig.json');
-
-    //Get guilds cache
-    const guild_Id = client.guilds.cache.get(guildId);
-
-    //Creates map of members with role
-    let role_map = guild_Id.members.cache.filter(member => member.roles.cache.find(role => role.id === roleId));
-
-    //defines the iterator
-    const iterator1 = role_map.keys();
-
-    //set bot Activity
-    client.user.setActivity("V1.1 Released!");
-
-    //for loop the size of the map
-    for (let i = 0; i < role_map.size; i++) {
-
-        //User ID - iterates through the map
-        let user_Id = iterator1.next().value;
-
-        //Get Guild ID of User ID
-        let User_GuildId = guild_Id.members.cache.get(user_Id);
-
-        //checks if user is older than 60 days by calling calcdate()
-        if (calcDate.calcDate(User_GuildId).TotalMonths > 2) {
-
-            //adds roleID variable
-            let User_RoleId = User_GuildId.guild.roles.cache.get(roleId);
-
-            //if user has role run
-            if (User_GuildId.roles.cache.has(roleId)) {
-
-                //adds role
-                User_GuildId.roles.remove(roleId);
-
-                //prints to console
-                console.log(`${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}\n${User_GuildId.displayName} was removed from role: ${User_RoleId.name}\n`);
-
-            }
-
-            //if user does not have role
-            else {
-
-            }
-
-        }
-
-    }
-
-    //sets interval to 10 minutes
-    setTimeout(fetchloop, 10 * 60 * 1000);
-
-}
-
-//function to delete caches
-function requireUncached(module) {
-
-    delete require.cache[require.resolve(module)];
-
-    return require(module);
-
-}
-
-
-//Date calculation for users
-function calcDate(UserGuildID) {
-
-    //Gets current time
-    const TimestampNow = (Date.now());
-
-    //author join-date timestamp - unix timecode
-    const TimestampJoinedGuild = (UserGuildID.joinedTimestamp);
-
-    //convert unix timecode into hours.
-    // /1000 to convert to seconds. /60 converts to minutes. /60 converts to hours. rounds down.
-    const TotalHours = Math.floor((TimestampNow - TimestampJoinedGuild) / 1000 / 60 / 60);
-
-    // /24 converts hours to days - rounds down.
-    const TotalDays = Math.floor(TotalHours / 24);
-
-    // Subtract total number days off total number of hours
-    //prevents out of bounds var if days/weeks/months/years are used
-    const GuildHours = TotalHours - (TotalDays * 24);
-
-    //Months uses 30 days as a month todo: fix month usage
-    const TotalMonths = Math.floor(TotalDays / 30);
-
-    //takes total days subtracted by (num. of months * 30)
-    //prevents out of bounds var if weeks/months/years are used
-    const GuildDays = TotalDays - (TotalMonths * 30);
-
-    //takes total days divided by 365 to get years
-    const TotalYears = Math.floor(TotalDays / 365);
-
-    //prevents out of bounds var if years are used
-    const GuildMonths = TotalMonths - (TotalYears * 12);
-
-    //returns variables
-    return {
-        TimestampNow,
-        TimestampJoinedGuild,
-        TotalHours,
-        TotalDays,
-        GuildHours,
-        TotalMonths,
-        GuildDays,
-        TotalYears,
-        GuildMonths,
-    };
-
-}
-
-
-
 //retreives User information and send an embed message
-function Interaction() {
+const {clientId, guildId} = require("./config.json");
+const calcDate = require("./calcDate");
+const {MessageEmbed, Permissions, MessageActionRow, MessageButton} = require("discord.js");
+const moment = require("moment");
+const fsLibrary = require("fs");
+const requireUncached = require("./requireUncached")
+
+function Interaction(client) {
 
     //listens for interactions (slash commands)
     client.on('interactionCreate', async interaction => {
@@ -259,7 +19,7 @@ function Interaction() {
         //Button for confirming rules are read
         if (interaction.isButton()) {
 
-            const {roleId} = requireUncached('./roleconfig.json');
+            const {roleId} = requireUncached.requireUncached('./roleconfig.json');
 
             //Get guilds cache
             const guild_Id = client.guilds.cache.get(guildId);
@@ -328,7 +88,7 @@ function Interaction() {
         //looks for mention command
         if (commandName === 'userinfo') {
 
-            const {adminroleId} = requireUncached('./adminroleconfig.json');
+            const {adminroleId} = requireUncached.requireUncached('./adminroleconfig.json');
 
             //Get guilds cache
             const guild_Id = client.guilds.cache.get(guildId);
@@ -423,7 +183,7 @@ function Interaction() {
         //looks for new member role command
         if (commandName === 'newmemberroles') {
 
-            const {adminroleId} = requireUncached('./adminroleconfig.json');
+            const {adminroleId} = requireUncached.requireUncached('./adminroleconfig.json');
 
             //Get guilds cache
             const guild_Id = client.guilds.cache.get(guildId);
@@ -476,7 +236,7 @@ function Interaction() {
         //looks for new member role command
         if (commandName === 'adminmemberrole') {
 
-            const {adminroleId} = requireUncached('./adminroleconfig.json');
+            const {adminroleId} = requireUncached.requireUncached('./adminroleconfig.json');
 
             //Get guilds cache
             const guild_Id = client.guilds.cache.get(guildId);
@@ -516,7 +276,7 @@ function Interaction() {
         //looks for welcome channel commands
         if (commandName === 'welcomechannel') {
 
-            const {adminroleId} = requireUncached('./adminroleconfig.json');
+            const {adminroleId} = requireUncached.requireUncached('./adminroleconfig.json');
 
             //Get guilds cache
             const guild_Id = client.guilds.cache.get(guildId);
@@ -605,8 +365,5 @@ function Interaction() {
     });
 
 }
-*/
 
-// Login to Discord with your client's token
-client.login(token);
-
+module.exports = { Interaction };

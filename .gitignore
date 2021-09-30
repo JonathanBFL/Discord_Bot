@@ -1,6 +1,6 @@
-config.json
+src/config.json
 package-lock.json
-roleconfig.json
-channelconfig.json
+src/roleconfig.json
+src/channelconfig.json
 # Project exclude paths
 /node_modules/
