@@ -212,7 +212,7 @@ function Interaction(client) {
                     let role_Id = `{\n"roleId": "${role_Info.id}"\n}`;
 
                     //write data in 'roleconfig.json'.
-                    fsLibrary.writeFile('roleconfig.json', role_Id, (error) => {
+                    fsLibrary.writeFile('./src/roleconfig.json', role_Id, (error) => {
 
                     })
 
@@ -254,7 +254,7 @@ function Interaction(client) {
                 let role_Id = `{\n"adminroleId": "${role_Info.id}"\n}`;
 
                 //write data in 'adminroleconfig.json'.
-                fsLibrary.writeFile('adminroleconfig.json', role_Id, (error) => {
+                fsLibrary.writeFile('./src/adminroleconfig.json', role_Id, (error) => {
 
                 })
 
@@ -297,7 +297,7 @@ function Interaction(client) {
                     let channel_Id = `{\n"channelID": "${channel_Info.id}"\n}`;
 
                     //write data in 'channelconfig.json'.
-                    fsLibrary.writeFile('channelconfig.json', channel_Id, (error) => {
+                    fsLibrary.writeFile('./src/channelconfig.json', channel_Id, (error) => {
 
                     })
 
