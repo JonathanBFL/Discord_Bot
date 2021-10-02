@@ -13,6 +13,14 @@ const commands = [
             .setDescription('The channel')),   //give description
 
     new SlashCommandBuilder()
+        .setName('hasnotreadrulesrole')    //names the command
+        .setDescription('Choose the role of a user who has not read rules')
+        .addRoleOption(option => option
+            .setRequired(true)  //requires mention input
+            .setName('role')  //mentioned user var
+            .setDescription('The role')),   //give description
+
+    new SlashCommandBuilder()
         .setName('newmemberroles')
         .setDescription('Sets the role for new members')
         .addRoleOption(option => option

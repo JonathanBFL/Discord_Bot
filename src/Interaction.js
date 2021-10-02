@@ -234,6 +234,59 @@ function Interaction(client) {
         }
 
         //looks for new member role command
+        if (commandName === 'readrulesrole') {
+
+            const {rulesroleId} = requireUncached.requireUncached('./hasnotreadrulesrole.json');
+
+            //Get guilds cache
+            const guild_Id = client.guilds.cache.get(guildId);
+
+            //grabs role
+            let role_Id = guild_Id.roles.cache.get(rulesroleId);
+
+            //Requires designated role or admins to run command
+            if (interaction.member.permissions.has('Administrator') || interaction.member.roles.cache.has(role_Id.id)) {
+
+                //data which will need to add in a file.
+                let role_Info = interaction.options.getRole('role');
+
+                //If the "new member" role has admin privileges, rejects it
+                if (role_Info.permissions.has(Permissions.FLAGS.ADMINISTRATOR) === true){
+
+                    //informs user
+                    interaction.reply(`That role has Administrative privileges **<@${interaction.member.id}>**`);
+
+                }
+
+                //if the new member role _does not_ have admin privileges, write it.
+                else {
+
+                    //formats data
+                    let role_Id = `{\n"roleId": "${role_Info.id}"\n}`;
+
+                    //write data in 'roleconfig.json'.
+                    fsLibrary.writeFile('./src/hasnotreadrulesrole.json', role_Id, (error) => {
+
+                    })
+
+                    //informs the user
+                    interaction.reply(`Has Not Read Rules Role changed to **${role_Info.name}**`);
+
+                }
+
+            }
+
+            //if not admin or bot command role - informs user they cant use this command
+            else {
+
+                //lets user know they dont have permissions to run command
+                interaction.reply(`You do not have permissions to use that command **<@${interaction.member.id}>**.`);
+
+            }
+
+        }
+
+        //looks for bot control role command
         if (commandName === 'adminmemberrole') {
 
             const {adminroleId} = requireUncached.requireUncached('./adminroleconfig.json');
