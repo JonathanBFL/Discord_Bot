@@ -1,9 +1,19 @@
 //function to delete caches
 function requireUncached(module) {
 
-    delete require.cache[require.resolve(module)];
+    try {
 
-    return require(module);
+        delete require.cache[require.resolve(module)];
+
+        return require(module);
+
+    }
+
+    catch(err) {
+
+        console.log('!!!!! error occured in requireuncached.js !!!!!');
+
+    }
 
 }
 
