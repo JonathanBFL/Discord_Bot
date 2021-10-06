@@ -27,7 +27,7 @@ function fetchloop(client) {
         const iterator1 = role_map.keys();
 
         //set bot Activity
-        client.user.setActivity("V1.1 Released!");
+        client.user.setActivity("V1.1.3 Released!");
 
         //for loop the size of the map
         for (let i = 0; i < role_map.size; i++) {

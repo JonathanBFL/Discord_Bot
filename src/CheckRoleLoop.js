@@ -59,10 +59,10 @@ function CheckRoleLoop(client) {
             console.log(`├───────────────────────────────────────────────────────┤`);
 
             //prints how many user the guild has
-            console.log(`│ ${guild_Id.name} has a total of ${guild_Id.members.cache.size} users.\t│`);
+            console.log(`│\t${guild_Id.name} has a total of ${guild_Id.members.cache.size} users.\t│`);
 
             //Prints how many channels the bot is monitoring
-            console.log(`│ Monitoring ${guild_Id.channels.cache.size} channels.\t\t\t\t│`);
+            console.log(`│\t\tMonitoring ${guild_Id.channels.cache.size} channels.\t\t\t│`);
 
             //box formatting
             console.log(`└───────────────────────────────────────────────────────┘`)

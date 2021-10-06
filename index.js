@@ -5,7 +5,6 @@ const Interaction = require("./src/Interaction")
 const CheckRoleLoop = require("./src/CheckRoleLoop")
 const {roleIdHasNot} = require("./src/hasnotreadrulesrole.json");
 
-
 //import moment module
 const moment = require('moment-timezone')
 
