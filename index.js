@@ -7,7 +7,7 @@ const {roleIdHasNot} = require("./src/hasnotreadrulesrole.json");
 
 
 //import moment module
-const moment = require("moment");
+const moment = require('moment-timezone')
 
 // Create a new client instance
 const client = new Client({
@@ -31,13 +31,13 @@ client.once('ready', () => {
     client.guilds.cache.get(guildId).roles.fetch();
 
     //set bot Activity
-    client.user.setActivity("V1.1 Release!");
+    client.user.setActivity("V1.1.3 Release!");
 
     //set a 1 second delay before functions are called - gives time to fetch caches
     setTimeout(() => {
 
         //Prints time the client connected
-        console.log(`\n${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}\nLogged in as ${client.user.tag}.`);
+        console.log(`\n${moment.tz('America/New_York').format('MMMM Do YYYY, h:mm:ss a')}\nLogged in as ${client.user.tag}.`);
 
         //Prints how many users/channels/servers the bot is monitoring
         console.log(`Monitoring ${client.users.cache.size} users, in ${client.channels.cache.size} channels of ${client.guilds.cache.size} servers.`);
@@ -60,8 +60,8 @@ client.once('ready', () => {
 client.on('guildMemberAdd', (guildMember) => {
 
     console.log('User: ' + guildMember.user.username + ' has joined the server!');
-    guildMember.roles.add(roleIdHasNot);
 
+    guildMember.roles.add(roleIdHasNot);
 
 });
 

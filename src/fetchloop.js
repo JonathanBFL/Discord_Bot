@@ -2,7 +2,7 @@
 const {guildId} = require("./config.json");
 const requireUncached = require("./requireUncached");
 const calcDate = require("./calcDate");
-const moment = require("moment");
+const moment = require('moment-timezone')
 
 function fetchloop(client) {
 
@@ -51,7 +51,7 @@ function fetchloop(client) {
                     User_GuildId.roles.remove(roleId);
 
                     //prints to console
-                    console.log(`${moment.utc(Date.now()).format('MMMM Do YYYY, h:mm:ss a')}\n${User_GuildId.displayName} was removed from role: ${User_RoleId.name}\n`);
+                    console.log(`${moment.tz('America/New_York').format('MMMM Do YYYY, h:mm:ss a')}\n${User_GuildId.displayName} was removed from role: ${User_RoleId.name}\n`);
 
                 }
 

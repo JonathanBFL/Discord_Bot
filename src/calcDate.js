@@ -51,7 +51,6 @@ function calcDate(UserGuildID) {
         console.log('!!!!! error occured in calcdate.js !!!!!')
     }
 
-
 }
 
 module.exports = { calcDate };
