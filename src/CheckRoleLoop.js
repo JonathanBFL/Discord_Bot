@@ -68,7 +68,7 @@ function CheckRoleLoop(client) {
             console.log(`└───────────────────────────────────────────────────────┘`)
 
             //maps everyone
-            let RoleMembers_map = guild_Id.roles.cache.find(r => r.id === '889284732167290880').members.map(member => member.displayName).join(` | `);
+            let RoleMembers_map = guild_Id.roles.cache.find(r => r.name === '@everyone').members.map(member => member.displayName).join(` | `);
 
             //prints everyone
             console.log(`Users in server:\n${RoleMembers_map}\n`);
